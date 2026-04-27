@@ -1,110 +1,99 @@
 import streamlit as st
 
-# إعدادات الصفحة لتظهر كأنها تطبيق موبايل
+# إعدادات المظهر الأساسية
 st.set_page_config(page_title="دارجي", layout="centered", initial_sidebar_state="collapsed")
 
-# --- CSS مخصص لمحاكاة تصميم ريبلت الأصلي ---
+# --- تنسيق التصميم السلس (CSS) ---
 st.markdown("""
     <style>
-    /* إخفاء العناصر الافتراضية لزيادة السلاسة */
     header {visibility: hidden;}
-    .main { background-color: #fcfcfc; }
+    .main { background-color: #ffffff; }
     
-    /* شريط العنوان العلوي (أبيض نظيف) */
-    .top-bar {
+    /* شريط العنوان العلوي */
+    .header-style {
         display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 20px; background: white; border-bottom: 1px solid #f0f0f0;
+        padding: 10px 20px; background: white; border-bottom: 1px solid #eee;
     }
-    .logo-text { color: #007b83; font-weight: bold; font-size: 22px; }
+    .logo-font { color: #007b83; font-weight: bold; font-size: 22px; }
 
-    /* البطاقة التعريفية (Hero Section) */
-    .hero-box {
+    /* بانر الترحيب (نفس القديم) */
+    .hero-banner {
         background-color: #f1f8f8; border-radius: 25px;
-        padding: 35px 20px; text-align: center; margin: 15px;
-        border: 1px solid #e0eeee;
+        padding: 40px 20px; text-align: center; margin: 15px;
     }
-    .hero-title { font-size: 26px; font-weight: bold; color: #1a1a1a; line-height: 1.3; }
-    .hero-sub { font-size: 14px; color: #666; margin-top: 10px; }
+    .hero-h1 { font-size: 26px; font-weight: bold; color: #1a1a1a; }
 
-    /* الشريط السفلي الثابت (Floating Nav) */
-    .nav-wrapper {
+    /* شريط التنقل السفلي الثابت */
+    .nav-footer {
         position: fixed; bottom: 0; left: 0; right: 0;
         background: white; display: flex; justify-content: space-around;
-        padding: 12px 0; border-top: 1px solid #eee; z-index: 1000;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        padding: 12px; border-top: 1px solid #eee; z-index: 1000;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # إدارة الصفحات
-if 'active_page' not in st.session_state:
-    st.session_state.active_page = 'الرئيسية'
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
 
-# 1. الهيدر العلوي
-st.markdown("""
-    <div class="top-bar">
-        <div style="font-size: 22px;">👤</div>
-        <div class="logo-text">دارجي</div>
-    </div>
-""", unsafe_allow_html=True)
+# 1. عرض الهيدر العلوي
+st.markdown('<div class="header-style"><div style="font-size:20px;">👤</div><div class="logo-font">دارجي</div></div>', unsafe_allow_html=True)
 
-# --- الصفحة الرئيسية ---
-if st.session_state.active_page == 'الرئيسية':
+# --- الصفحة الرئيسية (Home) ---
+if st.session_state.page == 'home':
     st.markdown("""
-        <div class="hero-box">
-            <div class="hero-title">لا تحتار.. أسطوات<br>ديرتك <span style="color:#007b83;">بين يديك</span></div>
-            <div class="hero-sub">دليلك الموثوق لأفضل الورش في ميسان</div>
+        <div class="hero-banner">
+            <div class="hero-h1">لا تحتار.. أسطوات<br>ديرتك <span style="color:#007b83;">بين يديك</span></div>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">دليلك الموثوق في ميسان</p>
         </div>
     """, unsafe_allow_html=True)
 
-    # 2. زر البحث الفعال
-    search_col1, search_col2 = st.columns([1, 4])
-    with search_col2:
-        query = st.text_input("", placeholder="ابحث عن أسطى، ورشة، اختصاص...", label_visibility="collapsed")
-    with search_col1:
-        if st.button("بحث", use_container_width=True):
-            if query:
-                st.info(f"🔍 جاري البحث عن: {query}")
-            else:
-                st.warning("يرجى كتابة شيء للبحث")
+    # قسم البحث الفعال
+    with st.container():
+        c1, c2 = st.columns([1, 4])
+        with c2:
+            query = st.text_input("", placeholder="ابحث عن أسطى، ورشة، أو تخصص...", label_visibility="collapsed")
+        with c1:
+            if st.button("بحث", use_container_width=True):
+                if query:
+                    st.success(f"🔍 جاري البحث عن: {query}")
+                else:
+                    st.warning("اكتب شيئاً!")
 
-    # 3. تصنيفات المركبات
-    st.markdown("<p style='text-align:right; padding: 10px 20px 0 0; font-weight:bold;'>⭐ حسب نوع المركبة</p>", unsafe_allow_html=True)
+    # تصنيفات المركبات
+    st.markdown("<p style='text-align:right; padding-right:20px; font-weight:bold;'>⭐ حسب نوع المركبة</p>", unsafe_allow_html=True)
     cats = ["سيدان", "بيك أب", "حوض", "شاحنة", "دراجة"]
-    c_cols = st.columns(len(cats))
-    for idx, c in enumerate(cats):
-        c_cols[idx].button(c, key=f"cat_{idx}")
+    cols = st.columns(5)
+    for i, cat in enumerate(cats):
+        cols[i].button(cat, key=cat)
 
-# --- صفحة الإدارة (إدخال الأسطى) ---
-elif st.session_state.active_page == 'الإدارة':
-    st.markdown("<h3 style='text-align:center; color:#007b83;'>تسجيل أسطى جديد</h3>", unsafe_allow_html=True)
-    
+# --- صفحة الإدارة (تسجيل الأسطى) ---
+elif st.session_state.page == 'admin':
+    st.markdown("<h3 style='text-align:center;'>تسجيل ورشة جديدة</h3>", unsafe_allow_html=True)
     with st.container(border=True):
-        name = st.text_input("اسم الأسطى أو الورشة")
+        st.text_input("الأسم الكامل للأسطى")
         
-        # إدخال الرقم وتاكيده كما طلبت
+        # نظام التأكيد بالرقم (مهم جداً)
         phone = st.text_input("رقم الهاتف")
         confirm_phone = st.text_input("تأكيد رقم الهاتف")
         
-        specialty = st.selectbox("الاختصاص", ["ميكانيك", "كهرباء", "تيربو", "حدادة"])
+        st.selectbox("المحافظة", ["ميسان", "بغداد", "البصرة"])
+        st.selectbox("الاختصاص", ["ميكانيك", "كهرباء", "تيربو"])
         
-        if st.button("تأكيد التسجيل ✅", use_container_width=True):
-            if not phone or not confirm_phone:
-                st.error("الرجاء إدخال الرقم وتأكيده")
-            elif phone != confirm_phone:
-                st.error("رقم الهاتف غير متطابق!")
+        if st.button("إرسال طلب التفعيل ✅", use_container_width=True):
+            if phone == confirm_phone and len(phone) > 5:
+                st.success("تم تأكيد الرقم وإرسال الطلب!")
             else:
-                st.success(f"تم تسجيل {name} بنجاح وجاري التفعيل")
+                st.error("رقم الهاتف غير متطابق!")
 
-# 4. الشريط السفلي (Navigation) لتبديل الصفحات بسلاسة
+# 2. شريط التنقل السفلي (أزرار حقيقية لتغيير الصفحة)
 st.markdown("<br><br><br>", unsafe_allow_html=True)
-nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
-
-with nav_col1:
-    if st.button("🏠\nالرئيسية"): st.session_state.active_page = 'الرئيسية'
-with nav_col2:
-    if st.button("🔧\nالدليل"): st.session_state.active_page = 'الرئيسية'
-with nav_col3:
-    if st.button("⚠️\nبلاغ"): st.info("سيتم تفعيل قسم البلاغات قريباً")
-with nav_col4:
-    if st.button("🔒\nالإدارة"): st.session_state.active_page = 'الإدارة'
+n1, n2, n3, n4 = st.columns(4)
+with n1:
+    if st.button("🏠\nالرئيسية"): st.session_state.page = 'home'
+with n2:
+    if st.button("🔧\nالدليل"): st.session_state.page = 'home'
+with n3:
+    if st.button("⚠️\nبلاغ"): st.info("قريباً")
+with n4:
+    if st.button("🔒\nالإدارة"): st.session_state.page = 'admin'
