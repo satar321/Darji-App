@@ -1,115 +1,113 @@
 import streamlit as st
-import pandas as pd
 
-# إعدادات الصفحة الأساسية
+# إعدادات الصفحة كاملة
 st.set_page_config(page_title="دارجي", layout="centered", initial_sidebar_state="collapsed")
 
-# --- تطبيق التصميم القديم بدقة عبر CSS ---
+# --- CSS لاستهداف التصميم القديم بدقة ---
 st.markdown("""
     <style>
-    /* تنسيق الخلفية العامة */
-    .main { background-color: #fcfcfc; }
+    /* إخفاء شريط Streamlit العلوي المزعج */
+    header {visibility: hidden;}
+    .main { background-color: #ffffff; padding-top: 0px; }
     
-    /* الحاوية العلوية (التركوازية الفاتحة) */
-    .hero-section {
-        background-color: #f0f7f7;
-        padding: 30px 15px;
-        border-radius: 25px;
-        text-align: center;
-        margin-bottom: 20px;
+    /* الشريط العلوي الأبيض */
+    .top-nav {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 20px; background: white; border-bottom: 1px solid #f0f0f0;
+        position: sticky; top: 0; z-index: 999;
     }
+    .logo-text { color: #007b83; font-weight: bold; font-size: 20px; }
     
-    .hero-title { color: #000; font-size: 28px; font-weight: bold; margin-bottom: 0px; }
+    /* البطاقة الرئيسية (التركوازية) */
+    .hero-card {
+        background-color: #f1f8f8; border-radius: 30px;
+        padding: 40px 20px; text-align: center; margin: 15px;
+    }
+    .hero-title { font-size: 26px; font-weight: bold; color: #000; line-height: 1.4; }
     .hero-highlight { color: #007b83; }
-    .hero-sub { color: #666; font-size: 14px; line-height: 1.6; margin-top: 10px; }
     
-    /* شريط البحث */
-    .search-container {
-        background: white;
-        border-radius: 50px;
-        padding: 5px 10px;
-        display: flex;
-        align-items: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        margin-top: 20px;
+    /* محرك البحث */
+    .search-bar {
+        background: white; border: 1px solid #eee; border-radius: 15px;
+        display: flex; align-items: center; padding: 10px 15px;
+        margin: -30px 30px 20px 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .search-btn {
-        background-color: #007b83 !important;
-        color: white !important;
-        border-radius: 40px !important;
-        padding: 10px 25px !important;
-        border: none;
+    .search-input { border: none; width: 100%; text-align: right; outline: none; }
+    .search-btn { background: #007b83; color: white; border: none; padding: 8px 20px; border-radius: 10px; }
+
+    /* التصنيفات */
+    .cat-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 20px; }
+    .cat-box { 
+        background: #f8f9fa; border: 1px solid #eee; border-radius: 12px;
+        padding: 8px 15px; min-width: 80px; text-align: center; font-size: 13px;
     }
-    
-    /* تصنيفات المركبات */
-    .cat-item {
-        background: white;
-        border: 1px solid #eee;
-        border-radius: 15px;
-        padding: 8px 12px;
-        text-align: center;
-        font-size: 13px;
-        margin: 5px;
+
+    /* شريط التنقل السفلي */
+    .bottom-nav {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: white; display: flex; justify-content: space-around;
+        padding: 12px; border-top: 1px solid #eee; z-index: 1000;
     }
-    
-    /* التنبيه البرتقالي */
-    .orange-alert {
-        background-color: #ff8c00;
-        color: white;
-        padding: 20px;
-        border-radius: 15px;
-        text-align: right;
-        margin-top: 20px;
-        position: relative;
-    }
+    .nav-item { text-align: center; color: #999; font-size: 11px; }
+    .nav-item.active { color: #007b83; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- محاكاة الواجهة ---
-
-# 1. قسم العنوان
+# 1. شريط التنقل العلوي
 st.markdown("""
-    <div class="hero-section">
+    <div class="top-nav">
+        <div style="font-size: 20px;">👤</div>
+        <div class="logo-text">دارجي 🏠</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# 2. القسم الرئيسي
+st.markdown("""
+    <div class="hero-card">
         <div class="hero-title">لا تحتار.. أسطوات<br>ديرتك <span class="hero-highlight">بين يديك</span></div>
-        <div class="hero-sub">دارجي يجمع لك أفضل الأسطوات الورش<br>في مكان واحد. تصفح، اختر، وتواصل مباشرة.</div>
+        <div style="color: #777; font-size: 14px; margin-top: 10px;">
+            دارجي يجمع لك أفضل الأسطوات الورش في مكان واحد.<br>تصفح، اختر، وتواصل مباشرة.
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
-# 2. شريط البحث
-col_s1, col_s2 = st.columns([1, 3])
-with col_s1:
-    st.button("بحث", key="search_btn")
-with col_s2:
-    st.text_input("", placeholder="ابحث عن أسطى، ورشة، أ...", label_visibility="collapsed")
-
-# 3. حسب نوع المركبة
-st.markdown("<div style='text-align:right; font-weight:bold; margin-top:20px;'>⭐ حسب نوع المركبة</div>", unsafe_allow_html=True)
-categories = ["سيدان", "بيك أب", "حوض", "شاحنة", "دراجة"]
-cols = st.columns(5)
-for i, cat in enumerate(categories):
-    cols[i].markdown(f'<div class="cat-item">{cat}</div>', unsafe_allow_html=True)
-
-# 4. التنبيه البرتقالي
+# 3. شريط البحث
 st.markdown("""
-    <div class="orange-alert">
+    <div class="search-bar">
+        <button class="search-btn">بحث</button>
+        <input type="text" class="search-input" placeholder="ابحث عن أسطى، ورشة، أ...">
+    </div>
+""", unsafe_allow_html=True)
+
+# 4. حسب نوع المركبة
+st.markdown("<div style='text-align:right; padding: 0 20px; font-weight:bold;'>⭐ حسب نوع المركبة</div>", unsafe_allow_html=True)
+st.markdown("""
+    <div class="cat-scroll">
+        <div class="cat-box">سيدان</div>
+        <div class="cat-box">بيك أب</div>
+        <div class="cat-box">حوض</div>
+        <div class="cat-box">شاحنة</div>
+        <div class="cat-box">دراجة</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# 5. التنبيه البرتقالي
+st.markdown("""
+    <div style="background: #ff8c00; color: white; margin: 20px; padding: 20px; border-radius: 15px; text-align: right;">
         <h4 style="margin:0;">عندك عطل ومحتاج مساعدة؟</h4>
-        <p style="margin:5px 0 0 0; font-size:12px;">بلغ عن عطل مركبتك وخلينا نوصلك بأقرب أسطى</p>
+        <div style="font-size: 12px; opacity: 0.9;">بلغ عن عطل مركبتك وخلينا نوصلك بأقرب أسطى</div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- شريط التنقل السفلي (محاكاة) ---
+# 6. شريط التنقل السفلي (الثابت)
 st.markdown("""
-    <hr style="margin-top:50px;">
-    <div style="display: flex; justify-content: space-around; text-align: center; font-size: 12px; color: #007b83;">
-        <div>🏠<br>الرئيسية</div>
-        <div>🔧<br>الدليل</div>
-        <div>⚠️<br>بلاغ</div>
-        <div>🛡️<br>الإدارة</div>
+    <div class="bottom-nav">
+        <div class="nav-item">🔒<br>الإدارة</div>
+        <div class="nav-item">⚠️<br>بلاغ</div>
+        <div class="nav-item">🔧<br>الدليل</div>
+        <div class="nav-item active">🏠<br>الرئيسية</div>
     </div>
 """, unsafe_allow_html=True)
 
-# إضافة لوحة التحكم في القائمة الجانبية كما هي
-with st.sidebar:
-    if st.text_input("رمز الدخول", type="password") == "star2026":
-        st.success("أهلاً يا ستار")
-        # هنا تضع كود عرض الجدول الخاص بك
+# إضافة مساحة في الأسفل لكي لا يغطي الشريط السفلي المحتوى
+st.markdown("<br><br><br>", unsafe_allow_html=True)
