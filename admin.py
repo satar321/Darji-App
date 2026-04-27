@@ -1,72 +1,115 @@
 import streamlit as st
 import pandas as pd
 
-# إعدادات الصفحة
-st.set_page_config(page_title="دارجي - دليل الأسطوات", layout="wide", initial_sidebar_state="collapsed")
+# إعدادات الصفحة الأساسية
+st.set_page_config(page_title="دارجي", layout="centered", initial_sidebar_state="collapsed")
 
-# --- تنسيق CSS لمحاكاة التصميم القديم ---
+# --- تطبيق التصميم القديم بدقة عبر CSS ---
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .header-text { color: #007b83; text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-    .sub-text { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
-    .category-btn { background-color: white; border: 1px solid #ddd; border-radius: 20px; padding: 5px 15px; font-size: 12px; display: inline-block; margin: 2px; }
-    .workshop-card { background-color: white; border-radius: 15px; padding: 15px; border: 1px solid #eee; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .status-dot { color: #28a745; font-size: 12px; float: left; }
-    .btn-container { display: flex; gap: 10px; margin-top: 10px; }
-    .btn-call { background-color: #007b83; color: white; flex: 1; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-size: 14px; }
-    .btn-wa { background-color: white; color: #28a745; border: 1px solid #28a745; flex: 1; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-size: 14px; }
-    .search-box { border-radius: 25px !important; }
+    /* تنسيق الخلفية العامة */
+    .main { background-color: #fcfcfc; }
+    
+    /* الحاوية العلوية (التركوازية الفاتحة) */
+    .hero-section {
+        background-color: #f0f7f7;
+        padding: 30px 15px;
+        border-radius: 25px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .hero-title { color: #000; font-size: 28px; font-weight: bold; margin-bottom: 0px; }
+    .hero-highlight { color: #007b83; }
+    .hero-sub { color: #666; font-size: 14px; line-height: 1.6; margin-top: 10px; }
+    
+    /* شريط البحث */
+    .search-container {
+        background: white;
+        border-radius: 50px;
+        padding: 5px 10px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        margin-top: 20px;
+    }
+    .search-btn {
+        background-color: #007b83 !important;
+        color: white !important;
+        border-radius: 40px !important;
+        padding: 10px 25px !important;
+        border: none;
+    }
+    
+    /* تصنيفات المركبات */
+    .cat-item {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        padding: 8px 12px;
+        text-align: center;
+        font-size: 13px;
+        margin: 5px;
+    }
+    
+    /* التنبيه البرتقالي */
+    .orange-alert {
+        background-color: #ff8c00;
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: right;
+        margin-top: 20px;
+        position: relative;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- الواجهة الرئيسية ---
-st.markdown('<div class="header-text">لا تحتار.. أسطوات ديرتك بين يديك</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-text">دارجي يجمع لك أفضل الأسطوات في مكان واحد: تصفح، اختر، وتواصل مباشرة</div>', unsafe_allow_html=True)
+# --- محاكاة الواجهة ---
 
-# خانة البحث
-search_query = st.text_input("", placeholder="🔍 ابحث عن أسطى، ورشة، أو تخصص...", label_visibility="collapsed")
+# 1. قسم العنوان
+st.markdown("""
+    <div class="hero-section">
+        <div class="hero-title">لا تحتار.. أسطوات<br>ديرتك <span class="hero-highlight">بين يديك</span></div>
+        <div class="hero-sub">دارجي يجمع لك أفضل الأسطوات الورش<br>في مكان واحد. تصفح، اختر، وتواصل مباشرة.</div>
+    </div>
+""", unsafe_allow_html=True)
 
-# تصنيفات نوع المركبة
-st.write("⭐ **حسب نوع المركبة**")
-categories = ["سيدان", "بيك أب", "حوض", "شاحنة", "دراجة نارية", "تكتك", "باص", "جيب/SUV", "تراكتور", "مان"]
-cols_cat = st.columns(len(categories))
-for idx, cat in enumerate(categories):
-    with cols_cat[idx]:
-        st.markdown(f'<div class="category-btn">{cat}</div>', unsafe_allow_html=True)
+# 2. شريط البحث
+col_s1, col_s2 = st.columns([1, 3])
+with col_s1:
+    st.button("بحث", key="search_btn")
+with col_s2:
+    st.text_input("", placeholder="ابحث عن أسطى، ورشة، أ...", label_visibility="collapsed")
 
-st.write("---")
+# 3. حسب نوع المركبة
+st.markdown("<div style='text-align:right; font-weight:bold; margin-top:20px;'>⭐ حسب نوع المركبة</div>", unsafe_allow_html=True)
+categories = ["سيدان", "بيك أب", "حوض", "شاحنة", "دراجة"]
+cols = st.columns(5)
+for i, cat in enumerate(categories):
+    cols[i].markdown(f'<div class="cat-item">{cat}</div>', unsafe_allow_html=True)
 
-# قسم الأسطوات (مثال لمحاكاة التصميم)
-st.write("🟢 **أسطوات متصلين الآن**")
+# 4. التنبيه البرتقالي
+st.markdown("""
+    <div class="orange-alert">
+        <h4 style="margin:0;">عندك عطل ومحتاج مساعدة؟</h4>
+        <p style="margin:5px 0 0 0; font-size:12px;">بلغ عن عطل مركبتك وخلينا نوصلك بأقرب أسطى</p>
+    </div>
+""", unsafe_allow_html=True)
 
-# جلب البيانات الحقيقية من جدولك
-SHEET_URL = "https://docs.google.com/spreadsheets/d/1FTI3Vh2RNS3XL9VIJHEdmAcARI0vW34kZqHrRxsHm-g/gviz/tq?tqx=out:csv"
-try:
-    df = pd.read_csv(SHEET_URL)
-    
-    # عرض البيانات على شكل بطاقات
-    col1, col2 = st.columns(2)
-    for index, row in df.iterrows():
-        target_col = col1 if index % 2 == 0 else col2
-        with target_col:
-            with st.container():
-                st.markdown(f"""
-                <div class="workshop-card">
-                    <span class="status-dot">● متصل</span>
-                    <div style="font-weight:bold; font-size:16px;">{row.get('الاسم', 'ورشة غير مسماة')}</div>
-                    <div style="color:#888; font-size:12px;">📍 {row.get('المحافظة', 'العمارة')} - {row.get('الاختصاص', 'عام')}</div>
-                    <div class="btn-container">
-                        <a href="https://wa.me/{row.get('الهاتف', '')}" class="btn-wa">واتساب</a>
-                        <a href="tel:{row.get('الهاتف', '')}" class="btn-call">اتصال</a>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-except:
-    st.warning("جاري تحميل بيانات الأسطوات من الجدول...")
+# --- شريط التنقل السفلي (محاكاة) ---
+st.markdown("""
+    <hr style="margin-top:50px;">
+    <div style="display: flex; justify-content: space-around; text-align: center; font-size: 12px; color: #007b83;">
+        <div>🏠<br>الرئيسية</div>
+        <div>🔧<br>الدليل</div>
+        <div>⚠️<br>بلاغ</div>
+        <div>🛡️<br>الإدارة</div>
+    </div>
+""", unsafe_allow_html=True)
 
-# لوحة الإدارة (مخفية في القائمة الجانبية)
+# إضافة لوحة التحكم في القائمة الجانبية كما هي
 with st.sidebar:
-    st.title("🔒 إدارة ستار")
-    if st.text_input("الرمز") == "star2026":
-        st.write("أهلاً يا مدير!")
+    if st.text_input("رمز الدخول", type="password") == "star2026":
+        st.success("أهلاً يا ستار")
+        # هنا تضع كود عرض الجدول الخاص بك
