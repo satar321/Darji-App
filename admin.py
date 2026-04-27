@@ -1,51 +1,44 @@
 import streamlit as st
 import pandas as pd
 
-# --- إعدادات الإدارة (ستار) ---
-MY_WHATSAPP = "9647709094462" 
-SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1FTI3Vh2RNS3XL9VIJHEdmAcARI0vW34kZqHrRxsHm-g/gviz/tq?tqx=out:csv"
-
-ADMIN_DATA = {
-    "star": "star2026",
-    "moshref": "iraq2026"
-}
+# --- الإعدادات ---
+ADMIN_DATA = {"star": "star2026", "moshref": "iraq2026"}
+SHEET_URL = "https://docs.google.com/spreadsheets/d/1FTI3Vh2RNS3XL9VIJHEdmAcARI0vW34kZqHrRxsHm-g/gviz/tq?tqx=out:csv"
+WHATSAPP = "9647709094462"
 
 def main():
-    st.set_page_config(page_title="دارجي العراق - الإدارة", page_icon="🇮🇶")
-
+    st.set_page_config(page_title="دارجي العراق", page_icon="🇮🇶")
+    
     menu = ["🏠 الرئيسية", "🛠️ تسجيل أسطى", "🔒 لوحة التحكم"]
     choice = st.sidebar.selectbox("القائمة", menu)
 
-    if choice == "🛠️ تسجيل أسطى":
+    if choice == "🏠 الرئيسية":
+        st.title("🚗 أهلاً بك في تطبيق دارجي")
+        st.write("هنا ستظهر ورش التصليح الموثقة قريباً.")
+        st.image("https://via.placeholder.com/800x400.png?text=Darji+Iraq+App") # يمكنك وضع شعار تطبيقك هنا
+
+    elif choice == "🛠️ تسجيل أسطى":
         st.header("تسجيل ورشة جديدة")
-        with st.form("reg_form"):
+        with st.form("reg"):
             name = st.text_input("الأسم الكامل")
             phone = st.text_input("رقم الهاتف")
-            prov = st.selectbox("المحافظة", ["بغداد", "ميسان", "البصرة", "ذي قار", "النجف", "كربلاء", "بابل", "الأنبار", "نينوى", "ديالى", "واسط", "صلاح الدين", "كركوك", "المثنى", "القادسية", "أربيل", "السليمانية", "دهوك"])
-            job = st.selectbox("الاختصاص", ["ميكانيك", "كهرباء", "تبريد", "حدادة", "ونش"])
-            
-            if st.form_submit_button("إرسال طلب التفعيل ✅"):
-                if name and phone:
-                    # تنسيق الرسالة لتكون منظمة جداً عند وصولها لمجموعتك
-                    msg = (
-                        f"*📌 طلب تسجيل أسطى جديد*%0A"
-                        f"----------------------------%0A"
-                        f"*👤 الاسم:* {name}%0A"
-                        f"*📍 المحافظة:* {prov}%0A"
-                        f"*🔧 المهنة:* {job}%0A"
-                        f"*📞 الرقم:* {phone}%0A"
-                        f"----------------------------%0A"
-                        f"*✅ للموافقة التلقائية:* يرجى الرد بكلمة (تم التفعيل)"
-                    )
-                    wa_url = f"https://wa.me/{MY_WHATSAPP}?text={msg}"
-                    st.success("تم تنظيم طلبك! اضغط الزر لإرساله للإدارة.")
-                    st.markdown(f'<a href="{wa_url}" target="_blank" style="background-color: #25D366; color: white; padding: 12px; text-decoration: none; border-radius: 8px; display: block; text-align: center; font-weight: bold;">إرسال للتوثيق الآن ✅</a>', unsafe_allow_html=True)
-                else:
-                    st.error("يرجى إكمال البيانات")
+            prov = st.selectbox("المحافظة", ["بغداد", "ميسان", "البصرة", "ذي قار", "النجف", "كربلاء"])
+            if st.form_submit_button("إرسال للتوثيق ✅"):
+                msg = f"طلب جديد: {name} - {prov} - {phone}"
+                st.markdown(f'[اضغط هنا للإرسال وتفعيل حسابك](https://wa.me/{WHATSAPP}?text={msg})')
 
     elif choice == "🔒 لوحة التحكم":
-        # كود الإدارة والجدول (نفس السابق)
-        pass
+        st.header("دخول الإدارة")
+        user = st.text_input("اسم المستخدم")
+        pwd = st.text_input("كلمة المرور", type="password")
+        if st.button("دخول"):
+            if user in ADMIN_DATA and pwd == ADMIN_DATA[user]:
+                st.success(f"أهلاً ستار! إليك بيانات الأسطوات:")
+                try:
+                    df = pd.read_csv(SHEET_URL)
+                    st.table(df) # هذا سيعرض الجدول فوراً
+                except:
+                    st.warning("لا توجد بيانات مسجلة في الجدول حالياً.")
 
 if __name__ == "__main__":
     main()
