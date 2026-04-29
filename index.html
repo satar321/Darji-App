@@ -23,47 +23,43 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             border-top: 8px solid #b89c44;
         }
-        /* تعديل لعرض الصورة بشكل صحيح */
         .main-logo { width: 120px; height: auto; margin-bottom: 15px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto; }
         
         h1 { color: #001f3f; font-size: 22px; margin: 10px 0; }
+        p { color: #666; font-size: 14px; margin-bottom: 20px; }
+        
         input, select {
             width: 100%; padding: 14px; margin-bottom: 15px;
             border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
+            font-size: 16px;
         }
         .btn-send {
             background: #b89c44; color: white; border: none; padding: 15px;
             border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%;
+            transition: 0.3s;
         }
+        .btn-send:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
 <div id="splash">
-    <img src="logo.png" alt="تحميل...">
+    <img src="logo.png?v=2" alt="تحميل...">
 </div>
 
 <div class="card">
-    <img src="logo.png" class="main-logo" onerror="this.src='1000164438.png'" alt="شعار دارجي">
+    <img src="logo.png?v=2" class="main-logo" alt="شعار دارجي">
     
     <h1>تطبيق دارجي العراقي</h1>
-    <p style="color: #666; font-size: 14px;">دليلك الأول للميكانيك</p>
+    <p>دليلك الأول للميكانيك في ميسان</p>
     
     <input type="text" id="username" placeholder="الاسم الكامل">
-    <select id="usercity">
-        <option>ميسان</option><option>بغداد</option><option>البصرة</option>
+    
+    <select id="usertype">
+        <option value="أسطى">أنا أسطى (ميكانيكي)</option>
+        <option value="سائق">أنا صاحب سيارة (سائق)</option>
     </select>
-    <button class="btn-send" onclick="active()">تفعيل عبر واتساب</button>
-</div>
 
-<script>
-    setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 2000);
-    function active() {
-        const name = document.getElementById('username').value;
-        const city = document.getElementById('usercity').value;
-        if(!name) { alert("أدخل اسمك"); return; }
-        window.open(`https://wa.me/9647709094462?text=تفعيل دارجي:%0Aالاسم: ${name}%0Aالمحافظة: ${city}`);
-    }
-</script>
-</body>
-</html>
+    <select id="usercity">
+        <option>ميسان</option>
+        <option>بغداد</option>
