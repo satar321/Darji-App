@@ -3,136 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي - النسخة الاحترافية</title>
+    <title>دارجي - الدخول الذكي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #b89c44; --dark-blue: #001f3f; }
-        body { background-color: var(--dark-blue); font-family: 'Cairo', sans-serif; margin: 0; color: white; }
-        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .card { background: white; color: #333; padding: 25px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .logo { width: 100px; border-radius: 15px; margin-bottom: 10px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; }
-        .btn { background: var(--gold); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn:disabled { background: #ccc; }
-        #adminPanel { display: none; margin-top: 20px; border-top: 2px solid var(--gold); padding-top: 15px; }
-        .stats { display: flex; justify-content: space-around; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
-        .download-prompt { position: fixed; top: 0; width: 100%; background: var(--gold); padding: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        :root { --gold: #b89c44; --bg: #001f3f; }
+        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
+        .card { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        .logo { width: 120px; border-radius: 20px; margin-bottom: 15px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box; }
+        
+        /* زر الجي بي اس */
+        .gps-btn { background: #f0f0f0; color: #666; border: 2px dashed var(--gold); padding: 12px; border-radius: 12px; cursor: pointer; margin: 15px 0; transition: 0.3s; font-weight: bold; }
+        .gps-active { background: #e7f5ea; color: #28a745; border: 2px solid #28a745; }
+
+        /* زر الدخول الرئيسي */
+        .login-btn { background: var(--gold); color: white; border: none; padding: 16px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; opacity: 0.4; pointer-events: none; transition: 0.5s; }
+        .login-ready { opacity: 1; pointer-events: auto; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(184, 156, 68, 0.4); }
+        
+        .admin-link { margin-top: 20px; font-size: 12px; color: #aaa; cursor: pointer; display: block; }
     </style>
 </head>
-<body onload="checkFirstVisit()">
+<body>
 
-<div id="downloadBar" class="download-prompt">
-    <span>احصل على تجربة أفضل عبر التطبيق</span>
-    <button onclick="installApp()" style="background:white; color:var(--gold); border:none; padding:5px 15px; border-radius:10px; font-weight:bold;">تحميل الآن</button>
-</div>
-
-<div class="container">
-    <div class="card">
-        <img src="logo.png" alt="دارجي" class="logo">
-        <h2 id="mainTitle">تسجيل دخول دارجي</h2>
-        
-        <div id="regStep">
-            <input type="text" id="uName" placeholder="الاسم الكامل" required>
-            <input type="tel" id="uPhone" placeholder="رقم الهاتف" required>
-            <p id="gpsStatus" style="font-size:12px; color:red;">يرجى السماح بالوصول للموقع للمتابعة...</p>
-            <button id="entryBtn" class="btn" onclick="saveData()" disabled>دخول وتفعيل الموقع</button>
-            <p onclick="openAdmin()" style="font-size:11px; margin-top:15px; color:#999; cursor:pointer;">دخول الإدارة</p>
-        </div>
-
-        <div id="adminPanel">
-            <h3 style="color:var(--gold)">لوحة التحكم</h3>
-            <div class="stats">
-                <div>المستخدمين: <b id="userCount">0</b></div>
-                <div id="adminOnly">المواقع: <b id="locCount">0</b></div>
-            </div>
-            <div id="dataList" style="text-align:right; font-size:12px; max-height:200px; overflow-y:auto;">
-                </div>
-            <button class="btn" style="background:#333; margin-top:10px;" onclick="location.reload()">خروج</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    let coords = "";
-
-    // 1. طلب الموقع إجبارياً
-    function getGPS() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
-                coords = `${p.coords.latitude},${p.coords.longitude}`;
-                document.getElementById('gpsStatus').innerText = "تم تحديد الموقع بنجاح ✅";
-                document.getElementById('gpsStatus').style.color = "green";
-                document.getElementById('entryBtn').disabled = false;
-            }, () => {
-                alert("يجب تفعيل GPS لاستخدام دارجي");
-                location.reload();
-            });
-        }
-    }
-    getGPS();
-
-    // 2. حفظ البيانات في "المحفظة" (Storage) وتحويلها للإدارة
-    function saveData() {
-        const name = document.getElementById('uName').value;
-        const phone = document.getElementById('uPhone').value;
-        if(!name || !phone) return alert("أكمل الحقول!");
-
-        const user = { name, phone, loc: coords, date: new Date().toLocaleTimeString() };
-        
-        // حفظ في المحفظة المحلية
-        let allUsers = JSON.parse(localStorage.getItem('darji_db') || "[]");
-        allUsers.push(user);
-        localStorage.setItem('darji_db', JSON.stringify(allUsers));
-
-        alert("تم الحفظ والدخول بنجاح!");
-        document.getElementById('mainTitle').innerText = "مرحباً بك في دارجي";
-        document.getElementById('regStep').innerHTML = "<p>أنت الآن مسجل في النظام وجاري تتبع موقعك لخدمتك.</p>";
-    }
-
-    // 3. نظام الإدارة (المدير والمشرف)
-    function openAdmin() {
-        const pass = prompt("أدخل رمز الإدارة:");
-        const db = JSON.parse(localStorage.getItem('darji_db') || "[]");
-        
-        if (pass === "star123") { // رمز المدير (أنت)
-            showAdmin(true, db);
-        } else if (pass === "mushrif123") { // رمز المشرف (وصول محدود)
-            showAdmin(false, db);
-        } else {
-            alert("الرمز غير صحيح!");
-        }
-    }
-
-    function showAdmin(isFull, data) {
-        document.getElementById('regStep').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        document.getElementById('userCount').innerText = data.length;
-        
-        if (isFull) {
-            document.getElementById('locCount').innerText = data.length;
-            let list = "<b>قائمة المستخدمين:</b><br>";
-            data.forEach(u => {
-                list += `👤 ${u.name} - 📞 ${u.phone} <br>📍 <a href="https://maps.google.com/?q=${u.loc}" target="_blank">رؤية الموقع</a><hr>`;
-            });
-            document.getElementById('dataList').innerHTML = list;
-        } else {
-            document.getElementById('adminOnly').style.display = 'none';
-            document.getElementById('dataList').innerHTML = "<p style='color:red'>عذراً، لا تمتلك صلاحية عرض المواقع.</p>";
-        }
-    }
-
-    // 4. خيار التحميل
-    function checkFirstVisit() {
-        if(localStorage.getItem('appInstalled')) {
-            document.getElementById('downloadBar').style.display = 'none';
-        }
-    }
-    function installApp() {
-        alert("بدء تحميل تطبيق دارجي على هاتفك...");
-        localStorage.setItem('appInstalled', 'true');
-        document.getElementById('downloadBar').style.display = 'none';
-    }
-</script>
-
-</body>
-</html>
+<div class="card">
+    <img src="logo.png" class="logo" alt="دارجي">
+    <h2 style="margin:0 0 10px
