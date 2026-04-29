@@ -7,8 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                        url('https://images.unsplash.com/photo-1486006920555-c77dcf18193c?q=80&w=1920');
+            /* هنا نضع صورتك كخلفية ثابتة واحترافية */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://satar321.github.io/Darji-App/1000165895.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -20,25 +21,23 @@
             margin: 0;
         }
         .container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.92); /* شفافية بسيطة لتعطي جمالية */
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            width: 90%;
+            width: 85%;
             max-width: 400px;
             text-align: center;
-            border: 2px solid #25D366;
+            border-top: 5px solid #25D366;
         }
-        h1 { color: #008080; margin-bottom: 10px; }
-        p { color: #555; font-size: 14px; margin-bottom: 25px; }
         input, select {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 10px;
             font-family: 'Cairo', sans-serif;
+            font-size: 16px;
         }
         button {
             background-color: #25D366;
@@ -50,38 +49,37 @@
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            margin-top: 20px;
-            transition: 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
         }
-        button:hover { background-color: #128C7E; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>تطبيق دارجي</h1>
-        <p>سجل بياناتك للانضمام إلى أكبر شبكة في العراق</p>
-        <input type="text" id="name" placeholder="الاسم الكامل">
+        <h2 style="color: #075E54;">تطبيق دارجي</h2>
+        <p style="color: #666; margin-bottom: 20px;">أهلاً بك في منصة المحترفين</p>
+        <input type="text" id="name" placeholder="اكتب اسمك الكامل">
         <select id="type">
-            <option value="سائق">سائق</option>
-            <option value="أسطى">أسطى</option>
+            <option value="سائق">أنا سائق</option>
+            <option value="أسطى">أنا أسطى (ميكانيكي)</option>
         </select>
         <select id="city">
             <option value="ميسان">ميسان</option>
             <option value="بغداد">بغداد</option>
             <option value="البصرة">البصرة</option>
+            <option value="النجف">النجف</option>
+            <option value="كربلاء">كربلاء</option>
             </select>
-        <input type="tel" id="phone" placeholder="رقم الهاتف">
-        <button onclick="sendToWhatsApp()">تفعيل الحساب عبر واتساب</button>
+        <button onclick="sendData()">تفعيل عبر واتساب</button>
     </div>
 
     <script>
-        function sendToWhatsApp() {
-            const name = document.getElementById('name').value;
-            const type = document.getElementById('type').value;
-            const city = document.getElementById('city').value;
-            const phone = document.getElementById('phone').value;
-            const message = `طلب انضمام لتطبيق دارجي:%0Aالاسم: ${name}%0Aالفئة: ${type}%0Aالمحافظة: ${city}%0Aالهاتف: ${phone}`;
-            window.open(`https://wa.me/9647709094462?text=${message}`, '_blank');
+        function sendData() {
+            const n = document.getElementById('name').value;
+            const t = document.getElementById('type').value;
+            const c = document.getElementById('city').value;
+            const msg = `مشروع دارجي - طلب جديد:%0Aالاسم: ${n}%0Aالفئة: ${t}%0Aالمحافظة: ${c}`;
+            window.open(`https://wa.me/9647709094462?text=${msg}`);
         }
     </script>
 </body>
