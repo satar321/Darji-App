@@ -1,91 +1,37 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي العراقي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            background: #001f3f url('logo.png') no-repeat center center fixed; 
-            background-size: contain; 
-            font-family: 'Cairo', sans-serif; margin: 0; 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
-        .overlay { background: rgba(0, 31, 63, 0.9); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .card { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; margin-top: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
-        .logo { width: 90px; border-radius: 15px; margin-bottom: 10px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; text-align: center; box-sizing: border-box; }
-        .btn-gps { background: #f8f9fa; border: 2px dashed #b89c44; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: #001f3f; }
-        .btn-active { background: #e8f5e9; border: 2px solid #2e7d32; color: #2e7d32; }
-        .btn-main { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; opacity: 0.3; pointer-events: none; transition: 0.3s; }
-        .ready { opacity: 1; pointer-events: auto; transform: translateY(-2px); }
-        .download-link { background: #b89c44; color: white; padding: 10px 25px; border-radius: 20px; text-decoration: none; font-weight: bold; margin-top: 20px; z-index: 10; }
-    </style>
-</head>
-<body>
-    <div class="overlay"></div>
-    <a href="logo.png" download="Darji-App" class="download-link">📥 تحميل البرنامج</a>
+// استبدل وظيفة finishReg السابقة بهذا الكود المطور
+function finishReg() {
+    const data = {
+        name: document.getElementById('uName').value,
+        phone: document.getElementById('uPhone').value,
+        type: document.getElementById('uType').value,
+        job: document.getElementById('uJob').value || "سائق",
+        loc: coords
+    };
 
-    <div class="card" id="regForm">
+    if(!data.name || !data.phone) return alert("أخي الكريم، يرجى ملء البيانات");
+
+    // حفظ البيانات
+    let db = JSON.parse(localStorage.getItem('darji_db') || "[]");
+    db.push(data);
+    localStorage.setItem('darji_db', JSON.stringify(db));
+
+    // توجيه الأسطى لواجهته الخاصة بدلاً من البقاء في صفحة التسجيل
+    showProfile(data);
+}
+
+function showProfile(user) {
+    const mainCard = document.getElementById('mainCard');
+    
+    // واجهة الملف الشخصي للأسطى
+    mainCard.innerHTML = `
         <img src="logo.png" class="logo">
-        <h2 style="margin:5px 0; color:#001f3f;">دارجي للميكانيك</h2>
-        
-        <input type="text" id="uName" placeholder="الاسم الثلاثي">
-        <input type="tel" id="uPhone" placeholder="رقم الهاتف">
-        
-        <select id="uType" onchange="checkType()">
-            <option value="سائق">أنا سائق</option>
-            <option value="أسطى">أنا أسطى (صاحب مهنة)</option>
-        </select>
-
-        <select id="uJob" style="display:none; border: 2px solid #b89c44;">
-            <option value="">اختر تخصصك...</option>
-            <option value="فيتر">فيتر (ميكانيكي)</option>
-            <option value="بنجرجي">بنجرجي</option>
-            <option value="تغيير زيوت">تغيير زيوت</option>
-            <option value="حداد سيارات">حداد سيارات</option>
-        </select>
-
-        <div id="gpsBtn" class="btn-gps" onclick="getLocation()">📍 تفعيل خريطة الموقع</div>
-        <button id="submitBtn" class="btn-main" onclick="saveData()">دخول وتأكيد</button>
-        
-        <div onclick="window.location.href='admin.html'" style="font-size:11px; color:#ccc; margin-top:15px; cursor:pointer;">دخول الإدارة</div>
-    </div>
-
-    <script>
-        function checkType() {
-            document.getElementById('uJob').style.display = (document.getElementById('uType').value === 'أسطى') ? 'block' : 'none';
-        }
-
-        let userLoc = "";
-        function getLocation() {
-            navigator.geolocation.getCurrentPosition(p => {
-                userLoc = `${p.coords.latitude},${p.coords.longitude}`;
-                const b = document.getElementById('gpsBtn');
-                b.innerText = "تم تحديد موقعك بنجاح ✅";
-                b.classList.add('btn-active');
-                document.getElementById('submitBtn').classList.add('ready');
-            }, () => alert("يرجى تفعيل GPS"));
-        }
-
-        function saveData() {
-            const info = {
-                name: document.getElementById('uName').value,
-                phone: document.getElementById('uPhone').value,
-                type: document.getElementById('uType').value,
-                job: document.getElementById('uJob').value || "سائق",
-                loc: userLoc,
-                date: new Date().toLocaleString('ar-EG')
-            };
-            if(!info.name || !info.phone) return alert("يرجى ملء البيانات");
-            
-            let currentData = JSON.parse(localStorage.getItem('darji_final') || "[]");
-            currentData.push(info);
-            localStorage.setItem('darji_final', JSON.stringify(currentData));
-            
-            document.getElementById('regForm').innerHTML = `<h3>أهلاً بك ${info.name}</h3><p>تم حفظ بياناتك بنجاح في قاعدة بيانات دارجي.</p>`;
-        }
-    </script>
-</body>
-</html>
+        <h3 style="color:#001f3f;">ملف الأسطى: ${user.name}</h3>
+        <div style="background:#f8f9fa; padding:15px; border-radius:15px; margin:10px 0; text-align:right;">
+            <p><b>المهنة:</b> ${user.job}</p>
+            <p><b>رقم الهاتف:</b> ${user.phone}</p>
+            <p><b>حالة العمل:</b> <span style="color:green;">متصل الآن ✅</span></p>
+        </div>
+        <button class="btn-main active" onclick="location.reload()">تسجيل خروج</button>
+        <p style="font-size:12px; color:#666; margin-top:10px;">سيظهر ملفك الآن للزبائن القريبين منك في نظام دارجي</p>
+    `;
+}
