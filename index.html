@@ -3,82 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي العراقي</title>
+    <title>تطبيق دارجي - المتكامل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { 
-            background: #001f3f; 
+            background: #001f3f url('logo.png') no-repeat center center fixed; 
+            background-size: contain; 
             font-family: 'Cairo', sans-serif; margin: 0; color: white;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
         }
-        /* واجهة الدخول الأصلية */
-        .card { background: white; color: #333; padding: 30px; border-radius: 40px; width: 90%; max-width: 400px; text-align: center; margin-top: 50px; }
-        .logo-bg { background: #eee; padding: 20px; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
-        .input-label { text-align: right; color: #b89c44; font-weight: bold; font-size: 14px; margin-top: 15px; display: block; }
-        input, select { width: 100%; padding: 15px; margin: 5px 0; border-radius: 15px; border: 1px solid #eee; background: #f9f9f9; text-align: right; box-sizing: border-box; }
-        .btn-gold { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .overlay { background: rgba(0, 31, 63, 0.95); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .card { background: white; color: #333; padding: 20px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn-main { background: #b89c44; color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-gps { background: #f8f9fa; border: 2px dashed #b89c44; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: #001f3f; }
+        .active-gps { background: #e8f5e9; border: 2px solid #2e7d32; color: #2e7d32; }
         
-        /* لوحة التحكم */
-        .dashboard { display: none; width: 95%; max-width: 450px; text-align: center; }
-        .map-area { background: #f0f4f8; height: 180px; border-radius: 20px; margin: 15px 0; display: flex; align-items: center; justify-content: center; border: 2px solid #b89c44; color: #001f3f; }
-        .ad-section { background: #fff8e1; border: 1px solid #ffcc80; padding: 15px; border-radius: 15px; margin-top: 15px; color: #333; text-align: right; }
+        /* واجهة الخريطة والطلبات */
+        .map-box { background: #e3f2fd; height: 150px; border-radius: 15px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: #001f3f; font-weight: bold; border: 2px solid #b89c44; }
+        .ad-box { background: #fff3e0; border: 1px dashed #ff9800; padding: 10px; border-radius: 12px; margin-top: 15px; text-align: right; }
+        
+        /* واجهة التحميل */
+        #loader { display: none; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #b89c44; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-    <div class="card" id="loginScreen">
-        <div class="logo-bg"><img src="logo.png" style="width:80px;"></div>
-        <h2 style="color:#001f3f; margin:0;">تطبيق دارجي العراقي</h2>
-        <p style="font-size:14px; color:#666;">أدخل بياناتك لتصلك رسالة التفعيل</p>
-
-        <label class="input-label">الاسم الثلاثي</label>
-        <input type="text" id="uName" placeholder="مثال: ستار جبار علي">
-
-        <label class="input-label">رقم الهاتف (الواتساب)</label>
-        <input type="tel" id="uPhone" placeholder="0770XXXXXXX">
-
-        <label class="input-label">نوع الحساب</label>
-        <select id="uType">
-            <option value="أسطى">أنا أسطى (ميكانيكي)</option>
-            <option value="سائق">أنا سائق (صاحب سيارة)</option>
-        </select>
-
-        <button class="btn-gold" onclick="startApp()">دخول النظام</button>
+    <div class="overlay"></div>
+    
+    <div class="card" id="regPage">
+        <img src="logo.png" style="width:80px; border-radius:15px;">
+        <h2 style="color:#001f3f; margin:10px 0;">تطبيق دارجي العراقي</h2>
+        <input type="text" id="uName" style="width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ddd; text-align:center;" placeholder="الاسم الكامل">
+        <input type="tel" id="uPhone" style="width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ddd; text-align:center;" placeholder="رقم الهاتف">
+        
+        <div id="gpsBtn" class="btn-gps" onclick="getLoc()">📍 اضغط لتفعيل الموقع (GPS)</div>
+        
+        <button class="btn-main" onclick="startLoading()">دخول وتفعيل الموقع</button>
+        <p style="font-size:11px; color:#999; margin-top:10px;">دخول الإدارة</p>
     </div>
 
-    <div class="dashboard" id="mainDash">
-        <div class="card">
-            <div style="text-align:right; border-bottom:1px solid #eee; padding-bottom:10px;">
-                <h3 style="margin:0; color:#001f3f;">لوحة تحكم الأسطى</h3>
-                <span style="color:green; font-size:12px;">● متصل الآن</span>
-            </div>
+    <div class="card" id="loader">
+        <img src="logo.png" style="width:60px; border-radius:10px;">
+        <h3 id="loadText">جاري فتح واجهة التطبيق الرئيسية...</h3>
+        <div class="spinner"></div>
+    </div>
 
-            <div class="map-area">📍 جاري عرض الخريطة وتحديد الزبائن...</div>
-
-            <div style="text-align:right;">
-                <b style="color:#001f3f;">📩 طلبات قريبة:</b>
-                <p style="background:#f1f1f1; padding:10px; border-radius:10px; font-size:13px;">لا توجد طلبات مساعدة في ميسان حالياً.</p>
-            </div>
-
-            <div class="ad-section">
-                <b style="color:#e65100;">📢 إعلانات الزيوت:</b>
-                <p style="font-size:12px; margin:5px 0;">عرض خاص: زيت محرك (شل) بخصم حصري لمستخدمي دارجي!</p>
-            </div>
-
-            <button class="btn-gold" style="background:#cc0000;" onclick="location.reload()">تسجيل خروج</button>
+    <div class="card" id="dashPage" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; color:#001f3f;">لوحة التحكم</h3>
+            <span style="color:green; font-size:12px;">متصل الآن ✅</span>
         </div>
+        <hr>
+        
+        <div class="map-box" id="mapArea">📍 جاري عرض الخريطة والزبائن...</div>
+
+        <div style="text-align:right;">
+            <b style="color:#001f3f;">📩 طلبات الصيانة:</b>
+            <div style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:5px; font-size:13px;">لا توجد طلبات حالياً.</div>
+        </div>
+
+        <div class="ad-box" id="oilAds">
+            <b style="color:#e65100;">📢 عروض الزيوت المتوفرة:</b>
+            <p style="font-size:12px; margin:5px 0;">إعلان: يتوفر لدينا زيت محرك أصلي بخصم خاص للأسطوات.</p>
+        </div>
+
+        <button class="btn-main" style="background:#cc0000; margin-top:15px;" onclick="location.reload()">تسجيل خروج</button>
     </div>
 
     <script>
-        function startApp() {
-            const name = document.getElementById('uName').value;
-            const phone = document.getElementById('uPhone').value;
-            
-            if(!name || !phone) return alert("يرجى إكمال البيانات");
+        let coords = "";
+        function getLoc() {
+            navigator.geolocation.getCurrentPosition(p => {
+                coords = p.coords.latitude + "," + p.coords.longitude;
+                document.getElementById('gpsBtn').innerText = "تم تحديد الموقع بنجاح ✅";
+                document.getElementById('gpsBtn').classList.add('active-gps');
+            }, () => alert("يرجى تفعيل GPS"));
+        }
 
-            // الانتقال للواجهة الثانية
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainDash').style.display = 'block';
+        function startLoading() {
+            const name = document.getElementById('uName').value;
+            if(!name || !coords) return alert("يرجى إدخال الاسم وتفعيل GPS أولاً");
+
+            document.getElementById('regPage').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            // محاكاة التحميل لمدة 3 ثوانٍ
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('dashPage').style.display = 'block';
+                document.getElementById('mapArea').innerHTML = "🗺️ خريطة حية: زبون بالقرب منك (1.5 كم)";
+            }, 3000);
         }
     </script>
 </body>
