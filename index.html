@@ -3,63 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - الدليل العراقي</title>
+    <title>تطبيق دارجي - التفعيل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        #splash {
-            position: fixed; width: 100%; height: 100%; top:0; left:0;
-            background: #001f3f; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-        }
-        #splash img { width: 150px; border-radius: 15px; }
-        
         body {
             background-color: #001f3f; font-family: 'Cairo', sans-serif; margin: 0;
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .card {
-            background: #ffffff; padding: 30px; border-radius: 30px;
+            background: #ffffff; padding: 25px; border-radius: 30px;
             width: 90%; max-width: 380px; text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             border-top: 8px solid #b89c44;
         }
-        .main-logo { width: 120px; height: auto; margin-bottom: 15px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto; }
+        .main-logo { width: 120px; margin-bottom: 10px; border-radius: 12px; }
+        h1 { color: #001f3f; font-size: 20px; margin: 5px 0; }
+        p { color: #666; font-size: 13px; margin-bottom: 15px; }
         
-        h1 { color: #001f3f; font-size: 22px; margin: 10px 0; }
-        p { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .input-group { text-align: right; margin-bottom: 12px; }
+        label { display: block; font-size: 12px; color: #b89c44; font-weight: bold; margin-bottom: 4px; margin-right: 5px; }
         
         input, select {
-            width: 100%; padding: 14px; margin-bottom: 15px;
-            border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
-            font-size: 16px;
+            width: 100%; padding: 12px; border-radius: 12px; 
+            border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
+            font-size: 14px; background: #fdfdfd;
         }
         .btn-send {
-            background: #b89c44; color: white; border: none; padding: 15px;
-            border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%;
-            transition: 0.3s;
+            background: #b89c44; color: white; border: none; padding: 14px;
+            border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;
+            margin-top: 10px; transition: 0.3s;
         }
-        .btn-send:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
-<div id="splash">
-    <img src="logo.png?v=2" alt="تحميل...">
-</div>
-
 <div class="card">
-    <img src="logo.png?v=2" class="main-logo" alt="شعار دارجي">
-    
+    <img src="logo.png?v=2" class="main-logo" alt="Darji">
     <h1>تطبيق دارجي العراقي</h1>
-    <p>دليلك الأول للميكانيك في ميسان</p>
+    <p>أدخل بياناتك لتصلك رسالة التفعيل</p>
     
-    <input type="text" id="username" placeholder="الاسم الكامل">
-    
-    <select id="usertype">
-        <option value="أسطى">أنا أسطى (ميكانيكي)</option>
-        <option value="سائق">أنا صاحب سيارة (سائق)</option>
-    </select>
+    <div class="input-group">
+        <label>الاسم الثلاثي</label>
+        <input type="text" id="fullname" placeholder="مثال: ستار جبار علي">
+    </div>
 
-    <select id="usercity">
-        <option>ميسان</option>
-        <option>بغداد</option>
+    <div class="input-group">
+        <label>رقم الهاتف (الواتساب)</label>
+        <input type="tel" id="phone" placeholder="0770XXXXXXX">
+    </div>
+
+    <div class="input-group">
+        <label>كلمة السر (اختيار
