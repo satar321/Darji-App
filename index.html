@@ -3,28 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - الدخول الذكي</title>
+    <title>تسجيل دخول - دارجي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #b89c44; --bg: #001f3f; }
-        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
-        .card { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
-        .logo { width: 120px; border-radius: 20px; margin-bottom: 15px; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box; }
-        
-        /* زر الجي بي اس */
-        .gps-btn { background: #f0f0f0; color: #666; border: 2px dashed var(--gold); padding: 12px; border-radius: 12px; cursor: pointer; margin: 15px 0; transition: 0.3s; font-weight: bold; }
-        .gps-active { background: #e7f5ea; color: #28a745; border: 2px solid #28a745; }
-
-        /* زر الدخول الرئيسي */
-        .login-btn { background: var(--gold); color: white; border: none; padding: 16px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; opacity: 0.4; pointer-events: none; transition: 0.5s; }
-        .login-ready { opacity: 1; pointer-events: auto; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(184, 156, 68, 0.4); }
-        
-        .admin-link { margin-top: 20px; font-size: 12px; color: #aaa; cursor: pointer; display: block; }
+        :root { --gold: #b89c44; --navy: #001f3f; }
+        body { background-color: var(--navy); font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .logo { width: 110px; margin-bottom: 10px; border-radius: 15px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; text-align: center; font-family: 'Cairo'; }
+        .gps-btn { background: #f8f9fa; border: 2px dashed var(--gold); padding: 15px; border-radius: 12px; cursor: pointer; margin: 15px 0; font-weight: bold; color: var(--navy); }
+        .gps-success { border-style: solid; background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+        .login-btn { background: var(--gold); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; opacity: 0.3; pointer-events: none; transition: 0.3s; }
+        .login-active { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
+    <div class="card">
+        <img src="logo.png" class="logo" alt="Darji">
+        <h2 style="color: var(--navy); margin-bottom: 5px;">تطبيق دارجي</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px;">دليلك الأول للميكانيك</p>
 
-<div class="card">
-    <img src="logo.png" class="logo" alt="دارجي">
-    <h2 style="margin:0 0 10px
+        <input type="text" id="name" placeholder="الاسم الكامل">
+        <input type="tel" id="phone" placeholder="رقم الهاتف">
+
+        <div id="gpsBox" class="gps-btn" onclick="startGPS()">📍 اضغط لتفعيل الموقع</div>
+
+        <button id="mainBtn" class="login-btn" onclick="saveToCloud()">دخول النظام</button>
+        <p style="font-size: 10px; color: #aaa; margin-top: 15px;">بضغطك على دخول أنت توافق على شروط الخصوصية</p>
+    </div>
+
+    <script>
+        let locData = "";
+        function startGPS() {
+            if (navigator.geolocation) {
+                document.getElementById('gpsBox').innerText = "جاري الاتصال...";
+                navigator.geolocation.getCurrentPosition(p => {
+                    locData = `${p.coords.latitude},${p.coords.longitude}`;
+                    const box = document.getElementById('gpsBox');
+                    box.innerText = "تم تحديد موقعك بنجاح ✅";
+                    box.classList.add('gps-success');
+                    document.getElementById('mainBtn').classList.add('login-active');
+                }, () => alert("يرجى تفعيل GPS للمتابعة"));
+            }
+        }
+
+        function saveToCloud() {
+            const user = {
+                n: document.getElementById('name').value,
+                p: document.getElementById('phone').value,
+                l: locData,
+                t: new Date().toLocaleString('ar-EG')
+            };
+            if(!user.n || !user.p) return alert("أكمل البيانات");
+            
+            let db = JSON.parse(localStorage.getItem('darji_users') || "[]");
+            db.push(user);
+            localStorage.setItem('darji_users', JSON.stringify(db));
+            
+            alert("تم التسجيل بنجاح! سيتم تحويلك للبرنامج.");
+            // هنا تضع رابط واجهة التطبيق الداخلية
+        }
+    </script>
+</body>
+</html>
