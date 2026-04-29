@@ -16,4 +16,70 @@
         .logo-bg { background: #eee; padding: 20px; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
         .input-label { text-align: right; color: #b89c44; font-weight: bold; font-size: 14px; margin-top: 15px; display: block; }
         input, select { width: 100%; padding: 15px; margin: 5px 0; border-radius: 15px; border: 1px solid #eee; background: #f9f9f9; text-align: right; box-sizing: border-box; }
-        .btn-gold { background: #b89c44; color: white; border: none; padding: 15px; border-radius:
+        .btn-gold { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        
+        /* لوحة التحكم */
+        .dashboard { display: none; width: 95%; max-width: 450px; text-align: center; }
+        .map-area { background: #f0f4f8; height: 180px; border-radius: 20px; margin: 15px 0; display: flex; align-items: center; justify-content: center; border: 2px solid #b89c44; color: #001f3f; }
+        .ad-section { background: #fff8e1; border: 1px solid #ffcc80; padding: 15px; border-radius: 15px; margin-top: 15px; color: #333; text-align: right; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="loginScreen">
+        <div class="logo-bg"><img src="logo.png" style="width:80px;"></div>
+        <h2 style="color:#001f3f; margin:0;">تطبيق دارجي العراقي</h2>
+        <p style="font-size:14px; color:#666;">أدخل بياناتك لتصلك رسالة التفعيل</p>
+
+        <label class="input-label">الاسم الثلاثي</label>
+        <input type="text" id="uName" placeholder="مثال: ستار جبار علي">
+
+        <label class="input-label">رقم الهاتف (الواتساب)</label>
+        <input type="tel" id="uPhone" placeholder="0770XXXXXXX">
+
+        <label class="input-label">نوع الحساب</label>
+        <select id="uType">
+            <option value="أسطى">أنا أسطى (ميكانيكي)</option>
+            <option value="سائق">أنا سائق (صاحب سيارة)</option>
+        </select>
+
+        <button class="btn-gold" onclick="startApp()">دخول النظام</button>
+    </div>
+
+    <div class="dashboard" id="mainDash">
+        <div class="card">
+            <div style="text-align:right; border-bottom:1px solid #eee; padding-bottom:10px;">
+                <h3 style="margin:0; color:#001f3f;">لوحة تحكم الأسطى</h3>
+                <span style="color:green; font-size:12px;">● متصل الآن</span>
+            </div>
+
+            <div class="map-area">📍 جاري عرض الخريطة وتحديد الزبائن...</div>
+
+            <div style="text-align:right;">
+                <b style="color:#001f3f;">📩 طلبات قريبة:</b>
+                <p style="background:#f1f1f1; padding:10px; border-radius:10px; font-size:13px;">لا توجد طلبات مساعدة في ميسان حالياً.</p>
+            </div>
+
+            <div class="ad-section">
+                <b style="color:#e65100;">📢 إعلانات الزيوت:</b>
+                <p style="font-size:12px; margin:5px 0;">عرض خاص: زيت محرك (شل) بخصم حصري لمستخدمي دارجي!</p>
+            </div>
+
+            <button class="btn-gold" style="background:#cc0000;" onclick="location.reload()">تسجيل خروج</button>
+        </div>
+    </div>
+
+    <script>
+        function startApp() {
+            const name = document.getElementById('uName').value;
+            const phone = document.getElementById('uPhone').value;
+            
+            if(!name || !phone) return alert("يرجى إكمال البيانات");
+
+            // الانتقال للواجهة الثانية
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainDash').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
