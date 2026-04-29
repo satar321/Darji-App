@@ -3,77 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي - Darji</title>
+    <title>تطبيق دارجي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
-        /* شاشة التحميل أول الدخول */
+        /* شاشة التحميل (Splash Screen) */
         #splash {
-            position: fixed; width: 100%; height: 100%; background: #000;
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            position: fixed; width: 100%; height: 100%;
+            background-color: #002244; /* لون أزرق غامق مناسب للشعار */
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
         }
-        #splash img { width: 150px; border-radius: 50%; animation: pulse 2s infinite; }
+        #splash img { width: 150px; border-radius: 20px; animation: pulse 2s infinite; }
+        #splash p { color: white; margin-top: 20px; font-family: 'Cairo'; }
         @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
 
         body {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://satar321.github.io/Darji-App/1000165895.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
-            font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-color: #f0f4f8; font-family: 'Cairo', sans-serif;
+            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 25px;
-            width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            background: white; padding: 25px; border-radius: 25px;
+            width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #b89c44; /* لون ذهبي مناسب للشعار */
         }
-        .admin-link { font-size: 12px; color: #ccc; cursor: pointer; margin-top: 15px; display: block; text-decoration: none; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; }
-        button { background: #25D366; color: white; border: none; font-weight: bold; font-size: 18px; cursor: pointer; }
+        input, select {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px;
+            border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
+        }
+        button {
+            background-color: #b89c44; /* لون ذهبي للأزرار */
+            color: white; border: none; padding: 15px; border-radius: 12px;
+            font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
 <div id="splash">
-    <img src="https://satar321.github.io/Darji-App/1000165895.jpg" alt="Logo">
+    <img src="darji-logo.png" alt="شعار دارجي">
+    <p>جاري تحميل دارجي العراقي...</p>
 </div>
 
 <div class="container">
-    <img src="https://satar321.github.io/Darji-App/1000165895.jpg" style="width: 80px; border-radius: 50%;">
-    <h2 style="color: #075E54; margin: 10px 0;">مرحباً بك في دارجي</h2>
+    <img src="darji-logo.png" style="width: 120px; border-radius: 15px; margin-bottom: 10px;">
     
-    <input type="text" id="userName" placeholder="الاسم الكامل">
-    <select id="userType">
-        <option value="أسطى">أنا أسطى (ميكانيكي)</option>
-        <option value="سائق">أنا صاحب سيارة (سائق)</option>
+    <h2 style="color: #002244; margin: 10px 0;">تطبيق دارجي العراقي</h2>
+    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">دليلك الأول للميكانيك</p>
+    
+    <input type="text" id="name" placeholder="الاسم الكامل">
+    <select id="type">
+        <option value="أسطى">أنا أسطى</option>
+        <option value="سائق">أنا سائق سيارة</option>
     </select>
     <select id="city">
-        <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>النجف</option>
-        <option>كربلاء</option><option>ذي قار</option><option>بابل</option><option>واسط</option>
-        <option>الأنبار</option><option>نينوى</option><option>ديالى</option><option>المثنى</option>
-        <option>القادسية</option><option>صلاح الدين</option><option>كركوك</option><option>أربيل</option>
-        <option>السليمانية</option><option>دهوك</option>
+        <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>ذي قار</option>
     </select>
 
-    <button onclick="joinGroup()">تفعيل الحساب والانضمام للمجموعة</button>
-    
-    <a href="admin.html" class="admin-link">إدارة النظام (خاص بـ ستار)</a>
+    <button onclick="send()">تفعيل عبر واتساب</button>
 </div>
 
 <script>
-    // إخفاء شاشة التحميل
+    // إخفاء شاشة التحميل بعد 3 ثواني
     setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 3000);
 
-    function joinGroup() {
-        const name = document.getElementById('userName').value;
-        const type = document.getElementById('userType').value;
-        const city = document.getElementById('city').value;
-        
-        if(!name) { alert("أدخل اسمك أولاً"); return; }
-
-        // رسالة التفعيل التلقائي
-        const msg = `طلب تفعيل جديد:%0Aالاسم: ${name}%0Aالفئة: ${type}%0Aالمحافظة: ${city}%0Aأرغب بالانضمام لمجموعة دارجي`;
-        
-        // رابط مجموعة واتساب دارجي (استبدل الرموز برابط مجموعتك الحقيقي)
+    function send() {
+        const n = document.getElementById('name').value;
+        const t = document.getElementById('type').value;
+        const c = document.getElementById('city').value;
+        const msg = `تفعيل دارجي الجديد:%0Aالاسم: ${n}%0Aالفئة: ${t}%0Aالمحافظة: ${c}`;
         window.open(`https://wa.me/9647709094462?text=${msg}`);
     }
 </script>
