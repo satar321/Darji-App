@@ -3,81 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل دارجي</title>
+    <title>تطبيق دارجي - النسخة الاحترافية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #001f3f; font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: #ffffff; padding: 25px; border-radius: 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-top: 8px solid #b89c44; }
-        .main-logo { width: 100px; margin-bottom: 10px; border-radius: 12px; }
-        h1 { color: #001f3f; font-size: 20px; margin: 5px 0; }
-        .input-group { text-align: right; margin-bottom: 12px; }
-        label { display: block; font-size: 13px; color: #b89c44; font-weight: bold; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box; font-size: 14px; outline: none; }
-        .btn-active { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
-        #step2 { display: none; } /* إخفاء خانة الرمز في البداية */
-        .msg-info { color: #666; font-size: 13px; margin-bottom: 15px; }
+        :root { --gold: #b89c44; --dark-blue: #001f3f; }
+        body { background-color: var(--dark-blue); font-family: 'Cairo', sans-serif; margin: 0; color: white; }
+        .container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .card { background: white; color: #333; padding: 25px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .logo { width: 100px; border-radius: 15px; margin-bottom: 10px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; }
+        .btn { background: var(--gold); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn:disabled { background: #ccc; }
+        #adminPanel { display: none; margin-top: 20px; border-top: 2px solid var(--gold); padding-top: 15px; }
+        .stats { display: flex; justify-content: space-around; background: #f9f9f9; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+        .download-prompt { position: fixed; top: 0; width: 100%; background: var(--gold); padding: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
     </style>
 </head>
-<body>
+<body onload="checkFirstVisit()">
 
-<div class="card">
-    <img src="logo.png?v=3" class="main-logo" alt="Darji">
-    <h1>تطبيق دارجي العراقي</h1>
-    
-    <div id="step1">
-        <p class="msg-info">أدخل بياناتك لتصلك رسالة التفعيل</p>
-        <div class="input-group">
-            <label>الاسم الثلاثي</label>
-            <input type="text" id="fullname" placeholder="مثال: ستار جبار علي">
-        </div>
-        <div class="input-group">
-            <label>رقم الهاتف (الواتساب)</label>
-            <input type="tel" id="phone" placeholder="0770XXXXXXX">
-        </div>
-        <div class="input-group">
-            <label>كلمة السر (اختيارية)</label>
-            <input type="password" id="pass" placeholder="********">
-        </div>
-        <button class="btn-active" onclick="goToVerify()">تفعيل الحساب (واتساب)</button>
-    </div>
+<div id="downloadBar" class="download-prompt">
+    <span>احصل على تجربة أفضل عبر التطبيق</span>
+    <button onclick="installApp()" style="background:white; color:var(--gold); border:none; padding:5px 15px; border-radius:10px; font-weight:bold;">تحميل الآن</button>
+</div>
 
-    <div id="step2">
-        <p class="msg-info" style="color: #b89c44; font-weight: bold;">تم إرسال طلبك! أدخل الرمز الذي وصلك الآن</p>
-        <div class="input-group">
-            <label>رمز التأكيد</label>
-            <input type="number" id="verifyCode" placeholder="أدخل الرمز المكون من 4 أرقام">
+<div class="container">
+    <div class="card">
+        <img src="logo.png" alt="دارجي" class="logo">
+        <h2 id="mainTitle">تسجيل دخول دارجي</h2>
+        
+        <div id="regStep">
+            <input type="text" id="uName" placeholder="الاسم الكامل" required>
+            <input type="tel" id="uPhone" placeholder="رقم الهاتف" required>
+            <p id="gpsStatus" style="font-size:12px; color:red;">يرجى السماح بالوصول للموقع للمتابعة...</p>
+            <button id="entryBtn" class="btn" onclick="saveData()" disabled>دخول وتفعيل الموقع</button>
+            <p onclick="openAdmin()" style="font-size:11px; margin-top:15px; color:#999; cursor:pointer;">دخول الإدارة</p>
         </div>
-        <button class="btn-active" style="background: #28a745;" onclick="finish()">تأكيد الدخول</button>
-        <p style="font-size: 11px; margin-top: 10px; color: #888;">إذا لم يصلك الرمز، تأكد من إرسال الرسالة عبر الواتساب</p>
+
+        <div id="adminPanel">
+            <h3 style="color:var(--gold)">لوحة التحكم</h3>
+            <div class="stats">
+                <div>المستخدمين: <b id="userCount">0</b></div>
+                <div id="adminOnly">المواقع: <b id="locCount">0</b></div>
+            </div>
+            <div id="dataList" style="text-align:right; font-size:12px; max-height:200px; overflow-y:auto;">
+                </div>
+            <button class="btn" style="background:#333; margin-top:10px;" onclick="location.reload()">خروج</button>
+        </div>
     </div>
 </div>
 
 <script>
-    function goToVerify() {
-        const name = document.getElementById('fullname').value;
-        const phone = document.getElementById('phone').value;
-        
-        if(!name || !phone) {
-            alert("يرجى ملء الاسم والرقم أولاً");
-            return;
+    let coords = "";
+
+    // 1. طلب الموقع إجبارياً
+    function getGPS() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                coords = `${p.coords.latitude},${p.coords.longitude}`;
+                document.getElementById('gpsStatus').innerText = "تم تحديد الموقع بنجاح ✅";
+                document.getElementById('gpsStatus').style.color = "green";
+                document.getElementById('entryBtn').disabled = false;
+            }, () => {
+                alert("يجب تفعيل GPS لاستخدام دارجي");
+                location.reload();
+            });
         }
+    }
+    getGPS();
 
-        // 1. فتح الواتساب لإرسال البيانات للإدارة (أنت)
-        const message = `طلب تفعيل حساب جديد:%0Aالاسم: ${name}%0Aالرقم: ${phone}`;
-        window.open(`https://wa.me/9647709094462?text=${message}`);
+    // 2. حفظ البيانات في "المحفظة" (Storage) وتحويلها للإدارة
+    function saveData() {
+        const name = document.getElementById('uName').value;
+        const phone = document.getElementById('uPhone').value;
+        if(!name || !phone) return alert("أكمل الحقول!");
 
-        // 2. الانتقال لخانة الرمز
-        document.getElementById('step1').style.display = 'none';
-        document.getElementById('step2').style.display = 'block';
+        const user = { name, phone, loc: coords, date: new Date().toLocaleTimeString() };
+        
+        // حفظ في المحفظة المحلية
+        let allUsers = JSON.parse(localStorage.getItem('darji_db') || "[]");
+        allUsers.push(user);
+        localStorage.setItem('darji_db', JSON.stringify(allUsers));
+
+        alert("تم الحفظ والدخول بنجاح!");
+        document.getElementById('mainTitle').innerText = "مرحباً بك في دارجي";
+        document.getElementById('regStep').innerHTML = "<p>أنت الآن مسجل في النظام وجاري تتبع موقعك لخدمتك.</p>";
     }
 
-    function finish() {
-        const code = document.getElementById('verifyCode').value;
-        if(code == "1234") { // يمكنك تغيير هذا الرمز لاحقاً
-            alert("تم التفعيل بنجاح! أهلاً بك في دارجي");
+    // 3. نظام الإدارة (المدير والمشرف)
+    function openAdmin() {
+        const pass = prompt("أدخل رمز الإدارة:");
+        const db = JSON.parse(localStorage.getItem('darji_db') || "[]");
+        
+        if (pass === "star123") { // رمز المدير (أنت)
+            showAdmin(true, db);
+        } else if (pass === "mushrif123") { // رمز المشرف (وصول محدود)
+            showAdmin(false, db);
         } else {
-            alert("الرمز غير صحيح، يرجى التأكد من الإدارة");
+            alert("الرمز غير صحيح!");
         }
+    }
+
+    function showAdmin(isFull, data) {
+        document.getElementById('regStep').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('userCount').innerText = data.length;
+        
+        if (isFull) {
+            document.getElementById('locCount').innerText = data.length;
+            let list = "<b>قائمة المستخدمين:</b><br>";
+            data.forEach(u => {
+                list += `👤 ${u.name} - 📞 ${u.phone} <br>📍 <a href="https://maps.google.com/?q=${u.loc}" target="_blank">رؤية الموقع</a><hr>`;
+            });
+            document.getElementById('dataList').innerHTML = list;
+        } else {
+            document.getElementById('adminOnly').style.display = 'none';
+            document.getElementById('dataList').innerHTML = "<p style='color:red'>عذراً، لا تمتلك صلاحية عرض المواقع.</p>";
+        }
+    }
+
+    // 4. خيار التحميل
+    function checkFirstVisit() {
+        if(localStorage.getItem('appInstalled')) {
+            document.getElementById('downloadBar').style.display = 'none';
+        }
+    }
+    function installApp() {
+        alert("بدء تحميل تطبيق دارجي على هاتفك...");
+        localStorage.setItem('appInstalled', 'true');
+        document.getElementById('downloadBar').style.display = 'none';
     }
 </script>
 
