@@ -2,54 +2,66 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة إدارة دارجي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+    <title>إدارة دارجي - نظام المشرفين</title>
     <style>
-        body { font-family: 'Cairo'; background: #f4f4f4; padding: 20px; text-align: center; }
-        .stat-card { background: #001f3f; color: white; padding: 20px; border-radius: 20px; display: inline-block; margin-bottom: 20px; min-width: 200px; }
-        table { width: 100%; background: white; border-radius: 15px; overflow: hidden; border-collapse: collapse; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        th { background: #b89c44; color: white; padding: 12px; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .map-link { color: blue; text-decoration: none; font-weight: bold; }
+        body { font-family: 'Cairo'; text-align: center; background: #f4f4f4; }
+        .admin-box { background: #001f3f; color: white; padding: 20px; margin: 20px; border-radius: 15px; }
+        table { width: 90%; margin: auto; background: white; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <h1>لوحة التحكم (المدير)</h1>
-    <div class="stat-card">
-        عدد المشتركين: <h2 id="count">0</h2>
+    <div id="loginArea">
+        <h2>تسجيل دخول المشرفين</h2>
+        <input type="password" id="adminPass" placeholder="أدخل رمز المرور">
+        <button onclick="checkAdmin()">دخول</button>
     </div>
 
-    <table id="userTable">
-        <thead>
-            <tr>
-                <th>الاسم</th>
-                <th>الهاتف</th>
-                <th>الموقع الجغرافي</th>
-                <th>وقت الدخول</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div id="panel" style="display:none;">
+        <div class="admin-box">
+            <h3>إحصائيات النظام</h3>
+            <p>عدد المستخدمين: <b id="userCount">0</b></p>
+        </div>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>النوع</th>
+                    <th>المهنة</th>
+                    <th>الموقع</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
     <script>
-        const pass = prompt("أدخل رمز الإدارة السري:");
-        if (pass === "star2026") { // رمزك الخاص
-            const db = JSON.parse(localStorage.getItem('darji_users') || "[]");
-            document.getElementById('count').innerText = db.length;
-            const tbody = document.querySelector("#userTable tbody");
+        const passwords = {
+            "star2026": "مدير عام",
+            "m111": "مشرف 1",
+            "m222": "مشرف 2",
+            "m333": "مشرف 3",
+            "m444": "مشرف 4"
+        };
+
+        function checkAdmin() {
+            const p = document.getElementById('adminPass').value;
+            if (passwords[p]) {
+                document.getElementById('loginArea').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
+                loadData(p === "star2026");
+            } else { alert("الرمز خطأ!"); }
+        }
+
+        function loadData(isFull) {
+            const db = JSON.parse(localStorage.getItem('darji_db') || "[]");
+            document.getElementById('userCount').innerText = db.length;
+            const tbody = document.querySelector("#dataTable tbody");
             
-            db.reverse().forEach(u => {
-                const row = `<tr>
-                    <td>${u.n}</td>
-                    <td>${u.p}</td>
-                    <td><a class="map-link" href="https://www.google.com/maps?q=${u.l}" target="_blank">📍 عرض الخريطة</a></td>
-                    <td>${u.t}</td>
-                </tr>`;
-                tbody.innerHTML += row;
+            db.forEach(u => {
+                const mapLink = isFull ? `<a href="https://www.google.com/maps?q=${u.loc}" target="_blank">📍 عرض</a>` : "مخفي";
+                tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.type}</td><td>${u.job}</td><td>${mapLink}</td></tr>`;
             });
-        } else {
-            alert("غير مصرح لك!");
-            document.body.innerHTML = "خطأ في الدخول";
         }
     </script>
 </body>
