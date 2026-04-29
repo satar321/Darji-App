@@ -3,64 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي - الدليل العراقي للميكانيك</title>
+    <title>دارجي - الدليل العراقي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #b89c44; --navy: #001f3f; }
         body { 
-            background: var(--navy) url('logo.png') no-repeat center center fixed; 
+            background: #001f3f url('logo.png') no-repeat center center fixed; 
             background-size: contain; 
-            font-family: 'Cairo', sans-serif; 
-            margin: 0; 
+            font-family: 'Cairo', sans-serif; margin: 0; color: white;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            color: white;
         }
         .overlay { background: rgba(0, 31, 63, 0.9); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        
-        .header { background: rgba(184, 156, 68, 0.2); width: 100%; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-small { width: 50px; border-radius: 10px; }
-        
-        .card { background: white; color: #333; padding: 25px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; }
+        .card { background: white; color: #333; padding: 25px; border-radius: 25px; width: 90%; max-width: 380px; text-align: center; margin-top: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; text-align: center; box-sizing: border-box; }
-        
-        .btn-main { background: var(--gold); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-gps { background: #f8f9fa; border: 2px dashed var(--gold); padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: var(--navy); }
-        .active { background: #e8f5e9; color: #2e7d32; border: 2px solid #2e7d32; }
-
-        /* خريطة الأسطوات */
-        #mapStep { display: none; margin-top: 20px; text-align: right; }
-        .mechanic-item { background: #f8f9fa; border-radius: 15px; padding: 15px; margin-bottom: 10px; border-right: 5px solid var(--gold); }
+        .btn-main { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-gps { background: #f8f9fa; border: 2px dashed #b89c44; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: #001f3f; }
+        .active { background: #e8f5e9; border: 2px solid #2e7d32; color: #2e7d32; }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
+    
+    <div class="card" id="mainCard">
+        <img src="logo.png" style="width:100px; border-radius:15px; margin-bottom:10px;">
+        <h2 style="margin:0; color:#001f3f;">تطبيق دارجي</h2>
+        <p style="font-size:14px; color:#666;">سجل بياناتك للوصول إلى الخدمات</p>
+        
+        <input type="text" id="uName" placeholder="الاسم الكامل">
+        <input type="tel" id="uPhone" placeholder="رقم الهاتف">
+        
+        <select id="uType" onchange="toggleJob()">
+            <option value="سائق">أنا سائق (صاحب سيارة)</option>
+            <option value="أسطى">أنا أسطى (صاحب مهنة)</option>
+        </select>
 
-    <div class="header">
-        <img src="logo.png" class="logo-small" alt="دارجي">
-        <span>تطبيق دارجي العراقي</span>
-        <button onclick="alert('جاري تجهيز التحميل لنسخة APK...')" style="background:var(--gold); border:none; padding:5px 10px; border-radius:10px; color:white; font-weight:bold;">📥 تحميل</button>
+        <select id="uJob" style="display:none; border: 2px solid #b89c44;">
+            <option value="">اختر التخصص الميكانيكي...</option>
+            <option value="فيتر">فيتر (ميكانيكي)</option>
+            <option value="بنجرجي">بنجرجي</option>
+            <option value="حداد سيارات">حداد سيارات</option>
+            <option value="تغيير زيوت">تغيير زيوت</option>
+        </select>
+
+        <div id="gpsBtn" class="btn-gps" onclick="getLoc()">📍 تفعيل الموقع (GPS)</div>
+        <button class="btn-main" onclick="startApp()">دخول النظام</button>
+        
+        <div onclick="window.location.href='admin.html'" style="font-size:10px; color:#ccc; margin-top:15px; cursor:pointer;">دخول الإدارة</div>
     </div>
 
-    <div class="container">
-        <div class="card" id="regStep">
-            <img src="logo.png" style="width:100px; border-radius:20px; margin-bottom:10px;" alt="دارجي">
-            <h2 style="color:var(--navy); margin:5px 0;">تسجيل دخول</h2>
-            <input type="text" id="uName" placeholder="الاسم الثلاثي">
-            <input type="tel" id="uPhone" placeholder="رقم الهاتف (الواتساب)">
+    <script>
+        function toggleJob() {
+            document.getElementById('uJob').style.display = (document.getElementById('uType').value === 'أسطى') ? 'block' : 'none';
+        }
+
+        let coords = "";
+        function getLoc() {
+            navigator.geolocation.getCurrentPosition(p => {
+                coords = `${p.coords.latitude},${p.coords.longitude}`;
+                const btn = document.getElementById('gpsBtn');
+                btn.innerText = "تم تحديد موقعك ✅";
+                btn.classList.add('active');
+            }, () => alert("يرجى تفعيل GPS"));
+        }
+
+        function startApp() {
+            const name = document.getElementById('uName').value;
+            const phone = document.getElementById('uPhone').value;
+            const job = document.getElementById('uJob').value || "سائق";
             
-            <select id="uType" onchange="toggleJob()">
-                <option value="سائق">أنا سائق (صاحب سيارة)</option>
-                <option value="أسطى">أنا أسطى (ميكانيكي)</option>
-            </select>
+            if(!name || !phone || !coords) return alert("يرجى ملء البيانات وتفعيل الموقع");
 
-            <select id="uJob" style="display:none; border: 2px solid var(--gold);">
-                <option value="">اختر تخصّصك...</option>
-                <option value="فيتر">فيتر (ميكانيكي)</option>
-                <option value="بنجرجي">بنجرجي</option>
-                <option value="حداد سيارات">حداد سيارات</option>
-                <option value="تغيير زيوت">تغيير زيوت</option>
-            </select>
+            let db = JSON.parse(localStorage.getItem('darji_db') || "[]");
+            db.push({name, phone, job, coords});
+            localStorage.setItem('darji_db', JSON.stringify(db));
 
-            <div id="gpsBox" class="btn-gps" onclick="getLocation()">📍 تفعيل خريطة الموقع</div>
-            <button class="btn-main" onclick="finishRegistration()">تفعيل وحفظ البيانات</button>
-            <p onclick="window.location.href='admin.html'" style="font-size:10px; color:#aaa; margin-top:
+            document.getElementById('mainCard').innerHTML = `
+                <img src="logo.png" style="width:80px; border-radius:10px;">
+                <h3 style="color:#001f3f;">أهلاً بك أسطى ${name}</h3>
+                <div style="background:#f9f9f9; padding:15px; border-radius:15px; text-align:right;">
+                    <p><b>المهنة:</b> ${job}</p>
+                    <p><b>الحالة:</b> <span style="color:green;">متصل الآن ✅</span></p>
+                </div>
+                <p style="font-size:12px;">موقعك الآن ظاهر للزبائن القريبين منك.</p>
+                <button class="btn-main" onclick="location.reload()">تسجيل خروج</button>
+            `;
+        }
+    </script>
+</body>
+</html>
