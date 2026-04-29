@@ -3,54 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي - التفعيل</title>
+    <title>تفعيل دارجي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #001f3f; font-family: 'Cairo', sans-serif; margin: 0;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-        }
-        .card {
-            background: #ffffff; padding: 25px; border-radius: 30px;
-            width: 90%; max-width: 380px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            border-top: 8px solid #b89c44;
-        }
-        .main-logo { width: 120px; margin-bottom: 10px; border-radius: 12px; }
+        body { background-color: #001f3f; font-family: 'Cairo', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #ffffff; padding: 25px; border-radius: 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-top: 8px solid #b89c44; }
+        .main-logo { width: 100px; margin-bottom: 10px; border-radius: 12px; }
         h1 { color: #001f3f; font-size: 20px; margin: 5px 0; }
-        p { color: #666; font-size: 13px; margin-bottom: 15px; }
-        
         .input-group { text-align: right; margin-bottom: 12px; }
-        label { display: block; font-size: 12px; color: #b89c44; font-weight: bold; margin-bottom: 4px; margin-right: 5px; }
-        
-        input, select {
-            width: 100%; padding: 12px; border-radius: 12px; 
-            border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
-            font-size: 14px; background: #fdfdfd;
-        }
-        .btn-send {
-            background: #b89c44; color: white; border: none; padding: 14px;
-            border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%;
-            margin-top: 10px; transition: 0.3s;
-        }
+        label { display: block; font-size: 13px; color: #b89c44; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box; font-size: 14px; outline: none; }
+        .btn-active { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        #step2 { display: none; } /* إخفاء خانة الرمز في البداية */
+        .msg-info { color: #666; font-size: 13px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <img src="logo.png?v=2" class="main-logo" alt="Darji">
+    <img src="logo.png?v=3" class="main-logo" alt="Darji">
     <h1>تطبيق دارجي العراقي</h1>
-    <p>أدخل بياناتك لتصلك رسالة التفعيل</p>
     
-    <div class="input-group">
-        <label>الاسم الثلاثي</label>
-        <input type="text" id="fullname" placeholder="مثال: ستار جبار علي">
+    <div id="step1">
+        <p class="msg-info">أدخل بياناتك لتصلك رسالة التفعيل</p>
+        <div class="input-group">
+            <label>الاسم الثلاثي</label>
+            <input type="text" id="fullname" placeholder="مثال: ستار جبار علي">
+        </div>
+        <div class="input-group">
+            <label>رقم الهاتف (الواتساب)</label>
+            <input type="tel" id="phone" placeholder="0770XXXXXXX">
+        </div>
+        <div class="input-group">
+            <label>كلمة السر (اختيارية)</label>
+            <input type="password" id="pass" placeholder="********">
+        </div>
+        <button class="btn-active" onclick="goToVerify()">تفعيل الحساب (واتساب)</button>
     </div>
 
-    <div class="input-group">
-        <label>رقم الهاتف (الواتساب)</label>
-        <input type="tel" id="phone" placeholder="0770XXXXXXX">
+    <div id="step2">
+        <p class="msg-info" style="color: #b89c44; font-weight: bold;">تم إرسال طلبك! أدخل الرمز الذي وصلك الآن</p>
+        <div class="input-group">
+            <label>رمز التأكيد</label>
+            <input type="number" id="verifyCode" placeholder="أدخل الرمز المكون من 4 أرقام">
+        </div>
+        <button class="btn-active" style="background: #28a745;" onclick="finish()">تأكيد الدخول</button>
+        <p style="font-size: 11px; margin-top: 10px; color: #888;">إذا لم يصلك الرمز، تأكد من إرسال الرسالة عبر الواتساب</p>
     </div>
+</div>
 
-    <div class="input-group">
-        <label>كلمة السر (اختيار
+<script>
+    function goToVerify() {
+        const name = document.getElementById('fullname').value;
+        const phone = document.getElementById('phone').value;
+        
+        if(!name || !phone) {
+            alert("يرجى ملء الاسم والرقم أولاً");
+            return;
+        }
+
+        // 1. فتح الواتساب لإرسال البيانات للإدارة (أنت)
+        const message = `طلب تفعيل حساب جديد:%0Aالاسم: ${name}%0Aالرقم: ${phone}`;
+        window.open(`https://wa.me/9647709094462?text=${message}`);
+
+        // 2. الانتقال لخانة الرمز
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    }
+
+    function finish() {
+        const code = document.getElementById('verifyCode').value;
+        if(code == "1234") { // يمكنك تغيير هذا الرمز لاحقاً
+            alert("تم التفعيل بنجاح! أهلاً بك في دارجي");
+        } else {
+            alert("الرمز غير صحيح، يرجى التأكد من الإدارة");
+        }
+    }
+</script>
+
+</body>
+</html>
