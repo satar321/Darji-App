@@ -3,75 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي</title>
+    <title>دارجي - الدليل العراقي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* شاشة التحميل (Splash Screen) */
         #splash {
-            position: fixed; width: 100%; height: 100%;
-            background-color: #002244; /* لون أزرق غامق مناسب للشعار */
-            display: flex; flex-direction: column;
+            position: fixed; width: 100%; height: 100%; top:0; left:0;
+            background: #001f3f; display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 9999;
         }
-        #splash img { width: 150px; border-radius: 20px; animation: pulse 2s infinite; }
-        #splash p { color: white; margin-top: 20px; font-family: 'Cairo'; }
-        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-
+        #splash img { width: 150px; border-radius: 15px; }
+        
         body {
-            background-color: #f0f4f8; font-family: 'Cairo', sans-serif;
-            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background-color: #001f3f; font-family: 'Cairo', sans-serif; margin: 0;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-        .container {
-            background: white; padding: 25px; border-radius: 25px;
-            width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 2px solid #b89c44; /* لون ذهبي مناسب للشعار */
+        .card {
+            background: #ffffff; padding: 30px; border-radius: 30px;
+            width: 90%; max-width: 380px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-top: 8px solid #b89c44;
         }
+        /* تعديل لعرض الصورة بشكل صحيح */
+        .main-logo { width: 120px; height: auto; margin-bottom: 15px; border-radius: 12px; display: block; margin-left: auto; margin-right: auto; }
+        
+        h1 { color: #001f3f; font-size: 22px; margin: 10px 0; }
         input, select {
-            width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px;
-            border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box;
         }
-        button {
-            background-color: #b89c44; /* لون ذهبي للأزرار */
-            color: white; border: none; padding: 15px; border-radius: 12px;
-            font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px;
+        .btn-send {
+            background: #b89c44; color: white; border: none; padding: 15px;
+            border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%;
         }
     </style>
 </head>
 <body>
 
 <div id="splash">
-    <img src="darji-logo.png" alt="شعار دارجي">
-    <p>جاري تحميل دارجي العراقي...</p>
+    <img src="logo.png" alt="تحميل...">
 </div>
 
-<div class="container">
-    <img src="darji-logo.png" style="width: 120px; border-radius: 15px; margin-bottom: 10px;">
+<div class="card">
+    <img src="logo.png" class="main-logo" onerror="this.src='1000164438.png'" alt="شعار دارجي">
     
-    <h2 style="color: #002244; margin: 10px 0;">تطبيق دارجي العراقي</h2>
-    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">دليلك الأول للميكانيك</p>
+    <h1>تطبيق دارجي العراقي</h1>
+    <p style="color: #666; font-size: 14px;">دليلك الأول للميكانيك</p>
     
-    <input type="text" id="name" placeholder="الاسم الكامل">
-    <select id="type">
-        <option value="أسطى">أنا أسطى</option>
-        <option value="سائق">أنا سائق سيارة</option>
+    <input type="text" id="username" placeholder="الاسم الكامل">
+    <select id="usercity">
+        <option>ميسان</option><option>بغداد</option><option>البصرة</option>
     </select>
-    <select id="city">
-        <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>ذي قار</option>
-    </select>
-
-    <button onclick="send()">تفعيل عبر واتساب</button>
+    <button class="btn-send" onclick="active()">تفعيل عبر واتساب</button>
 </div>
 
 <script>
-    // إخفاء شاشة التحميل بعد 3 ثواني
-    setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 3000);
-
-    function send() {
-        const n = document.getElementById('name').value;
-        const t = document.getElementById('type').value;
-        const c = document.getElementById('city').value;
-        const msg = `تفعيل دارجي الجديد:%0Aالاسم: ${n}%0Aالفئة: ${t}%0Aالمحافظة: ${c}`;
-        window.open(`https://wa.me/9647709094462?text=${msg}`);
+    setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 2000);
+    function active() {
+        const name = document.getElementById('username').value;
+        const city = document.getElementById('usercity').value;
+        if(!name) { alert("أدخل اسمك"); return; }
+        window.open(`https://wa.me/9647709094462?text=تفعيل دارجي:%0Aالاسم: ${name}%0Aالمحافظة: ${city}`);
     }
 </script>
 </body>
