@@ -3,94 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي - نظام الخرائط</title>
+    <title>تطبيق دارجي - الخرائط</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* جعل الشعار شفافاً في الخلفية */
         body { 
-            background: #001f3f; 
+            background: #001f3f url('logo.png') no-repeat center center fixed; 
+            background-size: 60%; /* حجم الشعار */
+            opacity: 0.9; /* درجة الشفافية */
             font-family: 'Cairo', sans-serif; margin: 0; color: white;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            overflow-x: hidden;
         }
-        /* الشعار الشفاف في الخلفية بعد الدخول */
-        .bg-watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; opacity: 0.1; z-index: -1; display: none;
-        }
-        .card { background: white; color: #333; padding: 20px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; margin-top: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1; }
+        .overlay { background: rgba(0, 31, 63, 0.85); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .card { background: white; color: #333; padding: 20px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; margin-top: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .input-field { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; text-align: center; box-sizing: border-box; }
         .btn-main { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        /* واجهة الخرائط */
-        #mapPage { display: none; width: 95%; max-width: 500px; }
-        .map-container { 
-            background: #e3f2fd; height: 350px; border-radius: 20px; 
-            margin: 20px 0; border: 3px solid #b89c44; position: relative;
-            display: flex; align-items: center; justify-content: center; color: #001f3f; font-weight: bold;
-        }
-        .mechanic-pin {
-            position: absolute; background: #cc0000; color: white; padding: 5px 10px;
-            border-radius: 10px; font-size: 12px; cursor: pointer;
-        }
-
-        #loader { display: none; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #b89c44; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* واجهة الخريطة */
+        #mapPage { display: none; width: 100%; height: 100vh; background: white; color: #333; position: fixed; top: 0; left: 0; z-index: 100; text-align: center; }
+        .map-header { background: #001f3f; color: white; padding: 15px; font-weight: bold; }
+        #googleMap { width: 100%; height: 80vh; border: none; }
     </style>
 </head>
 <body>
-    <img src="logo.png" id="bgLogo" class="bg-watermark">
-
-    <div class="card" id="regPage">
-        <img src="logo.png" style="width:100px; border-radius:15px; margin-bottom:10px;">
-        <h2 style="margin:0; color:#001f3f;">دخول النظام</h2>
-        <input type="text" id="uName" class="input-field" placeholder="الاسم الثلاثي">
+    <div class="overlay"></div>
+    
+    <div class="card" id="loginPage">
+        <img src="logo.png" style="width:100px; opacity: 0.8; margin-bottom:10px;">
+        <h2 style="color:#001f3f; margin:0;">دخول دارجي</h2>
+        <input type="text" id="uName" class="input-field" placeholder="الاسم الكامل">
         <input type="tel" id="uPhone" class="input-field" placeholder="رقم الهاتف">
-        <div id="gpsBtn" style="background:#eee; padding:12px; margin:10px 0; border-radius:12px; cursor:pointer;" onclick="getLoc()">📍 تفعيل الموقع (GPS)</div>
-        <button class="btn-main" onclick="showMap()">دخول السائق</button>
-    </div>
-
-    <div class="card" id="loader">
-        <div class="spinner"></div>
-        <h3 id="waitText">جاري تحديد مواقع الأسطوات...</h3>
-    </div>
-
-    <div id="mapPage" class="card">
-        <h3 style="margin:0; color:#001f3f;">خريطة الأسطوات القريبين</h3>
-        <p style="font-size: 12px; color: #666;">تم تحديد موقعك بنجاح. هؤلاء الأسطوات متاحون الآن في منطقتك.</p>
         
-        <div class="map-container">
-            🗺️ خريطة حية (GPS)
-            <div class="mechanic-pin" style="top: 20%; left: 30%;" onclick="alert('اتصال بالأسطى علي - فيتر')">الأسطى علي 🛠️</div>
-            <div class="mechanic-pin" style="bottom: 30%; right: 20%;" onclick="alert('اتصال بالأسطى ستار - كهربائي')">الأسطى ستار ⚡</div>
+        <div id="gpsBtn" style="background:#f0f2f5; padding:12px; margin:10px 0; border-radius:12px; cursor:pointer; border: 1px dashed #b89c44;" onclick="getLoc()">
+            📍 اضغط لتحديد موقعك
         </div>
+        
+        <button class="btn-main" onclick="openMap()">دخول النظام وعرض الخرائط</button>
+    </div>
 
-        <button class="btn-main" style="background:#2e7d32;" onclick="location.reload()">تحديث المواقع</button>
-        <button class="btn-main" style="background:#cc0000; margin-top:10px;" onclick="location.reload()">تسجيل خروج</button>
+    <div id="mapPage">
+        <div class="map-header">🗺️ خريطة الأسطوات القريبين منك</div>
+        <div style="padding: 10px; font-size: 14px;">يتم الآن عرض مواقع (الفيترية والكهربائية) في منطقتك..</div>
+        
+        <iframe id="googleMap" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d55555!2d47.15!3d31.85!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sar!2siq!4v1714410000000!5m2!1sar!2siq"></iframe>
+        
+        <button class="btn-main" style="width: 80%; margin-top: 10px; background: #cc0000;" onclick="location.reload()">خروج من الخريطة</button>
     </div>
 
     <script>
-        let coords = "";
+        let userCoords = "";
+
         function getLoc() {
             navigator.geolocation.getCurrentPosition(p => {
-                coords = p.coords.latitude + "," + p.coords.longitude;
+                userCoords = p.coords.latitude + "," + p.coords.longitude;
                 document.getElementById('gpsBtn').style.background = "#e8f5e9";
-                document.getElementById('gpsBtn').innerText = "تم تحديد موقعك ✅";
-            }, () => alert("يرجى تفعيل GPS لظهور الخريطة"));
+                document.getElementById('gpsBtn').innerHTML = "✅ تم تحديد موقعك بنجاح";
+            }, () => alert("يرجى تفعيل الـ GPS لكي نحدد الأسطوات حولك"));
         }
 
-        function showMap() {
+        function openMap() {
             const name = document.getElementById('uName').value;
-            if(!name || !coords) return alert("يرجى كتابة الاسم وتفعيل الموقع أولاً");
+            if(!name || !userCoords) return alert("يرجى إدخال اسمك وتحديد موقعك أولاً");
 
-            document.getElementById('regPage').style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
-
-            setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('bgLogo').style.display = 'block'; // إظهار الشعار الشفاف
-                document.getElementById('mapPage').style.display = 'block';
-            }, 2500);
+            // إزالة واجهة الدخول وفتح الخريطة
+            document.getElementById('loginPage').style.display = 'none';
+            document.body.style.background = "white"; // إزالة الخلفية الشفافة عند الدخول
+            document.getElementById('mapPage').style.display = 'block';
         }
     </script>
 </body>
