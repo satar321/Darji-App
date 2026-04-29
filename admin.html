@@ -2,31 +2,29 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>إدارة دارجي - نظام المشرفين</title>
+    <title>لوحة التحكم - دارجي</title>
     <style>
-        body { font-family: 'Cairo'; text-align: center; background: #f4f4f4; }
-        .admin-box { background: #001f3f; color: white; padding: 20px; margin: 20px; border-radius: 15px; }
-        table { width: 90%; margin: auto; background: white; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #ddd; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .stat-card { background: #001f3f; color: white; padding: 15px; border-radius: 15px; display: inline-block; margin-bottom: 20px; }
+        table { width: 100%; background: white; border-radius: 10px; border-collapse: collapse; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        th { background: #b89c44; color: white; padding: 12px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div id="loginArea">
-        <h2>تسجيل دخول المشرفين</h2>
-        <input type="password" id="adminPass" placeholder="أدخل رمز المرور">
-        <button onclick="checkAdmin()">دخول</button>
+    <div id="loginArea" style="margin-top: 100px;">
+        <h2>بوابة المشرفين والمدير</h2>
+        <input type="password" id="pInput" placeholder="أدخل الرمز السري الخاص" style="padding:10px; border-radius:8px; border:1px solid #ccc;">
+        <button onclick="login()" style="padding:10px 20px; background:#b89c44; color:white; border:none; border-radius:8px; cursor:pointer;">دخول</button>
     </div>
 
-    <div id="panel" style="display:none;">
-        <div class="admin-box">
-            <h3>إحصائيات النظام</h3>
-            <p>عدد المستخدمين: <b id="userCount">0</b></p>
-        </div>
-        <table id="dataTable">
+    <div id="dashboard" style="display:none;">
+        <div class="stat-card">المستخدمين المسجلين: <b id="total">0</b></div>
+        <table id="uTable">
             <thead>
                 <tr>
                     <th>الاسم</th>
-                    <th>النوع</th>
+                    <th>الفئة</th>
                     <th>المهنة</th>
                     <th>الموقع</th>
                 </tr>
@@ -36,31 +34,31 @@
     </div>
 
     <script>
-        const passwords = {
-            "star2026": "مدير عام",
-            "m111": "مشرف 1",
-            "m222": "مشرف 2",
-            "m333": "مشرف 3",
-            "m444": "مشرف 4"
+        // رموز معقدة ومختلفة للمشرفين والمدير
+        const keys = {
+            "Star@Master#2026": "المدير العام",
+            "M1_Z_99X": "المشرف 1",
+            "M2_R_77Y": "المشرف 2",
+            "M3_M_44Z": "المشرف 3",
+            "M4_B_11W": "المشرف 4"
         };
 
-        function checkAdmin() {
-            const p = document.getElementById('adminPass').value;
-            if (passwords[p]) {
+        function login() {
+            const pass = document.getElementById('pInput').value;
+            if (keys[pass]) {
                 document.getElementById('loginArea').style.display = 'none';
-                document.getElementById('panel').style.display = 'block';
-                loadData(p === "star2026");
-            } else { alert("الرمز خطأ!"); }
+                document.getElementById('dashboard').style.display = 'block';
+                loadUsers(pass === "Star@Master#2026");
+            } else { alert("الرمز غير صحيح!"); }
         }
 
-        function loadData(isFull) {
-            const db = JSON.parse(localStorage.getItem('darji_db') || "[]");
-            document.getElementById('userCount').innerText = db.length;
-            const tbody = document.querySelector("#dataTable tbody");
-            
-            db.forEach(u => {
-                const mapLink = isFull ? `<a href="https://www.google.com/maps?q=${u.loc}" target="_blank">📍 عرض</a>` : "مخفي";
-                tbody.innerHTML += `<tr><td>${u.name}</td><td>${u.type}</td><td>${u.job}</td><td>${mapLink}</td></tr>`;
+        function loadUsers(isAdmin) {
+            const data = JSON.parse(localStorage.getItem('darji_final') || "[]");
+            document.getElementById('total').innerText = data.length;
+            const body = document.querySelector("#uTable tbody");
+            data.reverse().forEach(u => {
+                const map = isAdmin ? `<a href="https://www.google.com/maps?q=${u.loc}" target="_blank">📍 عرض</a>` : "🔒 محجوب";
+                body.innerHTML += `<tr><td>${u.name}</td><td>${u.type}</td><td>${u.job}</td><td>${map}</td></tr>`;
             });
         }
     </script>
