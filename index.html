@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي - المتكامل</title>
+    <title>تطبيق دارجي العراقي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -14,85 +14,109 @@
         }
         .overlay { background: rgba(0, 31, 63, 0.95); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
         .card { background: white; color: #333; padding: 20px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn-main { background: #b89c44; color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-gps { background: #f8f9fa; border: 2px dashed #b89c44; padding: 10px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: #001f3f; }
+        .btn-main { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-gps { background: #f8f9fa; border: 2px dashed #b89c44; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: #001f3f; }
         .active-gps { background: #e8f5e9; border: 2px solid #2e7d32; color: #2e7d32; }
-        
-        /* واجهة الخريطة والطلبات */
-        .map-box { background: #e3f2fd; height: 150px; border-radius: 15px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: #001f3f; font-weight: bold; border: 2px solid #b89c44; }
-        .ad-box { background: #fff3e0; border: 1px dashed #ff9800; padding: 10px; border-radius: 12px; margin-top: 15px; text-align: right; }
+        .input-field { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; text-align: center; box-sizing: border-box; }
         
         /* واجهة التحميل */
         #loader { display: none; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #b89c44; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* واجهة الأسطى */
+        .map-box { background: #e3f2fd; height: 150px; border-radius: 15px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: #001f3f; font-weight: bold; border: 2px solid #b89c44; }
+        .ad-box { background: #fff3e0; border: 1px dashed #ff9800; padding: 10px; border-radius: 12px; margin-top: 15px; text-align: right; }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
     
     <div class="card" id="regPage">
-        <img src="logo.png" style="width:80px; border-radius:15px;">
-        <h2 style="color:#001f3f; margin:10px 0;">تطبيق دارجي العراقي</h2>
-        <input type="text" id="uName" style="width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ddd; text-align:center;" placeholder="الاسم الكامل">
-        <input type="tel" id="uPhone" style="width:100%; padding:10px; margin:5px 0; border-radius:8px; border:1px solid #ddd; text-align:center;" placeholder="رقم الهاتف">
+        <img src="logo.png" style="width:100px; border-radius:15px; margin-bottom:10px;">
+        <h2 style="margin:0; color:#001f3f;">تطبيق دارجي العراقي</h2>
+        <p style="font-size:14px; color:#666;">أدخل بياناتك لتصلك رسالة التفعيل</p>
         
+        <input type="text" id="uName" class="input-field" placeholder="الاسم الثلاثي">
+        <input type="tel" id="uPhone" class="input-field" placeholder="رقم الهاتف (الواتساب)">
+        
+        <div style="text-align: right; width: 100%;">
+            <label style="color: #b89c44; font-weight: bold; font-size: 14px; margin-right: 5px;">نوع الحساب</label>
+            <select id="uType" class="input-field" onchange="toggleJob()">
+                <option value="سائق">أنا سائق (صاحب سيارة)</option>
+                <option value="أسطى">أنا أسطى (ميكانيكي)</option>
+            </select>
+        </div>
+
+        <div id="jobSection" style="display:none; text-align: right; width: 100%;">
+            <label style="color: #b89c44; font-weight: bold; font-size: 14px; margin-right: 5px;">تخصصك المهني</label>
+            <select id="uJob" class="input-field" style="border: 2px solid #b89c44;">
+                <option value="فيتر">فيتر (ميكانيكي)</option>
+                <option value="كهربائي">كهربائي سيارات</option>
+                <option value="بنجرجي">بنجرجي</option>
+                <option value="حداد">حداد سيارات</option>
+                <option value="زيوت">تبديل زيوت</option>
+            </select>
+        </div>
+
         <div id="gpsBtn" class="btn-gps" onclick="getLoc()">📍 اضغط لتفعيل الموقع (GPS)</div>
-        
-        <button class="btn-main" onclick="startLoading()">دخول وتفعيل الموقع</button>
-        <p style="font-size:11px; color:#999; margin-top:10px;">دخول الإدارة</p>
+        <button class="btn-main" onclick="startApp()">دخول النظام</button>
     </div>
 
     <div class="card" id="loader">
         <img src="logo.png" style="width:60px; border-radius:10px;">
-        <h3 id="loadText">جاري فتح واجهة التطبيق الرئيسية...</h3>
+        <h3>أهلاً بك يا <span id="welcomeName"></span></h3>
+        <p>جاري فتح واجهة التطبيق الرئيسية...</p>
         <div class="spinner"></div>
     </div>
 
     <div class="card" id="dashPage" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="margin:0; color:#001f3f;">لوحة التحكم</h3>
-            <span style="color:green; font-size:12px;">متصل الآن ✅</span>
+            <span style="color:green; font-weight:bold;">متصل الآن ✅</span>
         </div>
         <hr>
-        
         <div class="map-box" id="mapArea">📍 جاري عرض الخريطة والزبائن...</div>
-
         <div style="text-align:right;">
             <b style="color:#001f3f;">📩 طلبات الصيانة:</b>
-            <div style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:5px; font-size:13px;">لا توجد طلبات حالياً.</div>
+            <div id="jobDetails" style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:5px; font-size:13px;"></div>
         </div>
-
-        <div class="ad-box" id="oilAds">
-            <b style="color:#e65100;">📢 عروض الزيوت المتوفرة:</b>
-            <p style="font-size:12px; margin:5px 0;">إعلان: يتوفر لدينا زيت محرك أصلي بخصم خاص للأسطوات.</p>
+        <div class="ad-box">
+            <b style="color:#e65100;">📢 إعلان إعلانات الزيوت:</b>
+            <p style="font-size:12px; margin:5px 0;">تصفح أحدث عروض الزيوت والقطع الأصلية هنا.</p>
         </div>
-
         <button class="btn-main" style="background:#cc0000; margin-top:15px;" onclick="location.reload()">تسجيل خروج</button>
     </div>
 
     <script>
+        function toggleJob() {
+            var type = document.getElementById('uType').value;
+            document.getElementById('jobSection').style.display = (type === 'أسطى') ? 'block' : 'none';
+        }
+
         let coords = "";
         function getLoc() {
             navigator.geolocation.getCurrentPosition(p => {
                 coords = p.coords.latitude + "," + p.coords.longitude;
-                document.getElementById('gpsBtn').innerText = "تم تحديد الموقع بنجاح ✅";
+                document.getElementById('gpsBtn').innerText = "تم تحديد موقعك بنجاح ✅";
                 document.getElementById('gpsBtn').classList.add('active-gps');
             }, () => alert("يرجى تفعيل GPS"));
         }
 
-        function startLoading() {
+        function startApp() {
             const name = document.getElementById('uName').value;
-            if(!name || !coords) return alert("يرجى إدخال الاسم وتفعيل GPS أولاً");
+            const job = document.getElementById('uJob').value || "سائق";
+            if(!name || !coords) return alert("يرجى إكمال البيانات وتفعيل الموقع");
 
             document.getElementById('regPage').style.display = 'none';
+            document.getElementById('welcomeName').innerText = name;
             document.getElementById('loader').style.display = 'block';
 
-            // محاكاة التحميل لمدة 3 ثوانٍ
             setTimeout(() => {
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('dashPage').style.display = 'block';
-                document.getElementById('mapArea').innerHTML = "🗺️ خريطة حية: زبون بالقرب منك (1.5 كم)";
+                document.getElementById('jobDetails').innerHTML = "<b>تخصصك الحالي:</b> " + job + "<br>لا توجد طلبات جديدة حالياً.";
+                document.getElementById('mapArea').innerHTML = "🗺️ خريطة ميسان: تم تحديد موقعك كـ " + job;
             }, 3000);
         }
     </script>
