@@ -3,121 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق دارجي العراقي</title>
+    <title>تطبيق دارجي - شبكة الميكانيك</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            background: #001f3f url('logo.png') no-repeat center center fixed; 
-            background-size: contain; 
-            font-family: 'Cairo', sans-serif; margin: 0; color: white;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
-        .overlay { background: rgba(0, 31, 63, 0.95); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
-        .card { background: white; color: #333; padding: 20px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn-main { background: #b89c44; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-gps { background: #f8f9fa; border: 2px dashed #b89c44; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; margin: 10px 0; color: #001f3f; }
-        .active-gps { background: #e8f5e9; border: 2px solid #2e7d32; color: #2e7d32; }
+        body { background: #001f3f url('logo.png') no-repeat center center fixed; background-size: contain; font-family: 'Cairo', sans-serif; margin: 0; color: white; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .overlay { background: rgba(0, 31, 63, 0.96); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .card { background: white; color: #333; padding: 15px; border-radius: 20px; width: 92%; max-width: 450px; text-align: center; margin-top: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
         .input-field { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: 1px solid #ddd; font-family: 'Cairo'; text-align: center; box-sizing: border-box; }
+        .btn-main { background: #b89c44; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; }
         
-        /* واجهة التحميل */
-        #loader { display: none; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #b89c44; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        /* واجهة المنشورات (مثل فيسبوك) */
+        .post-area { background: #f0f2f5; border-radius: 15px; padding: 10px; margin-top: 15px; text-align: right; }
+        .post-input { width: 100%; border: none; border-radius: 10px; padding: 10px; margin-bottom: 5px; resize: none; font-family: 'Cairo'; }
+        .post-card { background: white; border-radius: 12px; padding: 10px; margin-top: 10px; border: 1px solid #eee; }
+        
+        /* نظام الأصدقاء والمراسلة */
+        .tab-bar { display: flex; justify-content: space-around; background: #001f3f; padding: 10px; border-radius: 15px; margin-bottom: 10px; }
+        .tab-btn { color: #b89c44; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .chat-box { background: #e8f5e9; padding: 8px; border-radius: 10px; margin: 5px 0; font-size: 13px; display: flex; justify-content: space-between; }
+        
+        #loader, #socialPage { display: none; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #b89c44; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* واجهة الأسطى */
-        .map-box { background: #e3f2fd; height: 150px; border-radius: 15px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: #001f3f; font-weight: bold; border: 2px solid #b89c44; }
-        .ad-box { background: #fff3e0; border: 1px dashed #ff9800; padding: 10px; border-radius: 12px; margin-top: 15px; text-align: right; }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    
+
     <div class="card" id="regPage">
-        <img src="logo.png" style="width:100px; border-radius:15px; margin-bottom:10px;">
-        <h2 style="margin:0; color:#001f3f;">تطبيق دارجي العراقي</h2>
-        <p style="font-size:14px; color:#666;">أدخل بياناتك لتصلك رسالة التفعيل</p>
-        
-        <input type="text" id="uName" class="input-field" placeholder="الاسم الثلاثي">
-        <input type="tel" id="uPhone" class="input-field" placeholder="رقم الهاتف (الواتساب)">
-        
-        <div style="text-align: right; width: 100%;">
-            <label style="color: #b89c44; font-weight: bold; font-size: 14px; margin-right: 5px;">نوع الحساب</label>
-            <select id="uType" class="input-field" onchange="toggleJob()">
-                <option value="سائق">أنا سائق (صاحب سيارة)</option>
-                <option value="أسطى">أنا أسطى (ميكانيكي)</option>
-            </select>
-        </div>
-
-        <div id="jobSection" style="display:none; text-align: right; width: 100%;">
-            <label style="color: #b89c44; font-weight: bold; font-size: 14px; margin-right: 5px;">تخصصك المهني</label>
-            <select id="uJob" class="input-field" style="border: 2px solid #b89c44;">
-                <option value="فيتر">فيتر (ميكانيكي)</option>
-                <option value="كهربائي">كهربائي سيارات</option>
-                <option value="بنجرجي">بنجرجي</option>
-                <option value="حداد">حداد سيارات</option>
-                <option value="زيوت">تبديل زيوت</option>
-            </select>
-        </div>
-
-        <div id="gpsBtn" class="btn-gps" onclick="getLoc()">📍 اضغط لتفعيل الموقع (GPS)</div>
-        <button class="btn-main" onclick="startApp()">دخول النظام</button>
+        <img src="logo.png" style="width:80px; border-radius:12px;">
+        <h3 style="color:#001f3f; margin:5px 0;">مرحباً بك في دارجي</h3>
+        <input type="text" id="uName" class="input-field" placeholder="الاسم الكامل">
+        <select id="uType" class="input-field" onchange="document.getElementById('jobDiv').style.display=(this.value=='أسطى')?'block':'none'">
+            <option value="سائق">أنا سائق</option>
+            <option value="أسطى">أنا أسطى</option>
+        </select>
+        <div id="jobDiv" style="display:none;"><select id="uJob" class="input-field"><option value="فيتر">فيتر</option><option value="كهربائي">كهربائي</option></select></div>
+        <div id="gpsBtn" style="background:#eee; padding:10px; margin:10px 0; border-radius:10px; cursor:pointer; font-size:14px;" onclick="getLoc()">📍 تفعيل GPS</div>
+        <button class="btn-main" onclick="goToSocial()">دخول النظام</button>
     </div>
 
     <div class="card" id="loader">
-        <img src="logo.png" style="width:60px; border-radius:10px;">
-        <h3>أهلاً بك يا <span id="welcomeName"></span></h3>
-        <p>جاري فتح واجهة التطبيق الرئيسية...</p>
         <div class="spinner"></div>
+        <p>جاري تهيئة صفحتك الشخصية...</p>
     </div>
 
-    <div class="card" id="dashPage" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0; color:#001f3f;">لوحة التحكم</h3>
-            <span style="color:green; font-weight:bold;">متصل الآن ✅</span>
+    <div class="card" id="socialPage">
+        <div class="tab-bar">
+            <span class="tab-btn" onclick="showSec('feed')">الرئيسية</span>
+            <span class="tab-btn" onclick="showSec('friends')">الأصدقاء</span>
+            <span class="tab-btn" onclick="showSec('chat')">الرسائل</span>
         </div>
-        <hr>
-        <div class="map-box" id="mapArea">📍 جاري عرض الخريطة والزبائن...</div>
-        <div style="text-align:right;">
-            <b style="color:#001f3f;">📩 طلبات الصيانة:</b>
-            <div id="jobDetails" style="background:#f9f9f9; padding:10px; border-radius:10px; margin-top:5px; font-size:13px;"></div>
+
+        <div id="sec-feed">
+            <div class="post-area">
+                <textarea id="postTxt" class="post-input" placeholder="بماذا تفكر يا أسطى؟"></textarea>
+                <button class="btn-main" style="padding:5px;" onclick="addPost()">نشر</button>
+            </div>
+            <div id="feedContent">
+                <div class="post-card"><b>أدمن دارجي:</b> مرحباً بكم في النسخة الجديدة!</div>
+            </div>
         </div>
-        <div class="ad-box">
-            <b style="color:#e65100;">📢 إعلان إعلانات الزيوت:</b>
-            <p style="font-size:12px; margin:5px 0;">تصفح أحدث عروض الزيوت والقطع الأصلية هنا.</p>
+
+        <div id="sec-friends" style="display:none;">
+            <h4 style="margin:5px 0;">طلبات الصداقة</h4>
+            <div class="chat-box"><span>أسطى علي (ميكانيكي)</span> <button style="font-size:10px;">قبول</button></div>
+            <hr>
+            <h4 style="margin:5px 0;">أصدقاء مقترحون</h4>
+            <div class="chat-box"><span>سائق من ميسان</span> <button style="font-size:10px;">إضافة</button></div>
         </div>
-        <button class="btn-main" style="background:#cc0000; margin-top:15px;" onclick="location.reload()">تسجيل خروج</button>
+
+        <div id="sec-chat" style="display:none;">
+            <h4 style="margin:5px 0;">المحادثات الخاصة</h4>
+            <div class="chat-box" onclick="alert('فتح الدردشة...')">💬 دردشة مع أسطى محمد <span>12:30 م</span></div>
+        </div>
+
+        <p class="logout" style="color:red; font-size:12px; cursor:pointer; margin-top:15px;" onclick="location.reload()">تسجيل خروج</p>
     </div>
 
     <script>
-        function toggleJob() {
-            var type = document.getElementById('uType').value;
-            document.getElementById('jobSection').style.display = (type === 'أسطى') ? 'block' : 'none';
-        }
-
         let coords = "";
         function getLoc() {
             navigator.geolocation.getCurrentPosition(p => {
                 coords = p.coords.latitude + "," + p.coords.longitude;
-                document.getElementById('gpsBtn').innerText = "تم تحديد موقعك بنجاح ✅";
-                document.getElementById('gpsBtn').classList.add('active-gps');
+                document.getElementById('gpsBtn').style.background = "#e8f5e9";
+                document.getElementById('gpsBtn').innerText = "تم تفعيل الموقع ✅";
             }, () => alert("يرجى تفعيل GPS"));
         }
 
-        function startApp() {
-            const name = document.getElementById('uName').value;
-            const job = document.getElementById('uJob').value || "سائق";
-            if(!name || !coords) return alert("يرجى إكمال البيانات وتفعيل الموقع");
-
+        function goToSocial() {
+            if(!document.getElementById('uName').value || !coords) return alert("أكمل البيانات والـ GPS");
             document.getElementById('regPage').style.display = 'none';
-            document.getElementById('welcomeName').innerText = name;
             document.getElementById('loader').style.display = 'block';
-
             setTimeout(() => {
                 document.getElementById('loader').style.display = 'none';
-                document.getElementById('dashPage').style.display = 'block';
-                document.getElementById('jobDetails').innerHTML = "<b>تخصصك الحالي:</b> " + job + "<br>لا توجد طلبات جديدة حالياً.";
-                document.getElementById('mapArea').innerHTML = "🗺️ خريطة ميسان: تم تحديد موقعك كـ " + job;
-            }, 3000);
+                document.getElementById('socialPage').style.display = 'block';
+            }, 2500);
+        }
+
+        function showSec(id) {
+            ['feed', 'friends', 'chat'].forEach(s => document.getElementById('sec-'+s).style.display = 'none');
+            document.getElementById('sec-'+id).style.display = 'block';
+        }
+
+        function addPost() {
+            let txt = document.getElementById('postTxt').value;
+            if(!txt) return;
+            let p = document.createElement('div');
+            p.className = 'post-card';
+            p.innerHTML = `<b>${document.getElementById('uName').value}:</b><br>${txt}`;
+            document.getElementById('feedContent').prepend(p);
+            document.getElementById('postTxt').value = "";
         }
     </script>
 </body>
