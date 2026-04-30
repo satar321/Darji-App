@@ -3,87 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الإدارة - دارجي</title>
+    <title>لوحة تحكم المشرفين - دارجي</title>
     <style>
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .admin-container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #002147; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-        .stat-card { background: #b89344; color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        .user-list { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .user-list th, .user-list td { padding: 12px; border: 1px solid #ddd; text-align: right; }
-        .btn-action { padding: 5px 10px; border-radius: 5px; cursor: pointer; border: none; }
-        .btn-delete { background: #e74c3c; color: white; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; text-align: center; }
+        .admin-box { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        .user-row { background: #fff; padding: 12px; margin: 10px 0; border-radius: 10px; border-right: 5px solid #002147; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-delete { background: #ff4757; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        input { padding: 12px; width: 85%; margin-bottom: 15px; border-radius: 10px; border: 1px solid #ddd; text-align: center; font-size: 16px; }
+        .btn-login { padding: 12px 30px; background: #002147; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .master-panel { display: none; }
+        .delete-all { background: red; color: white; border: none; padding: 15px; border-radius: 10px; margin-top: 20px; cursor: pointer; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="adminLogin" class="login-overlay">
-    <div style="background: white; padding: 30px; border-radius: 20px; text-align: center;">
-        <h3>دخول المشرفين</h3>
-        <input type="password" id="adminPass" placeholder="أدخل الرمز السري" style="padding: 10px; width: 80%; border-radius: 5px; border: 1px solid #ddd;">
-        <br><br>
-        <button onclick="checkPass()" style="background: #b89344; color: white; border: none; padding: 10px 30px; border-radius: 10px;">دخول</button>
-    </div>
+<div id="loginArea" class="admin-box">
+    <h2 style="color: #002147;">🔒 دخول المشرفين</h2>
+    <p style="font-size: 13px; color: #666;">يرجى إدخال رمز الوصول الخاص بك</p>
+    <input type="password" id="adminPass" placeholder="الرمز السري">
+    <button onclick="checkAccess()" class="btn-login">دخول النظام</button>
 </div>
 
-<div class="admin-container">
-    <h2>📊 لوحة تحكم دارجي</h2>
-    <hr>
+<div id="adminContent" class="master-panel">
+    <h2 style="color: #002147;">لوحة إدارة تطبيق دارجي</h2>
+    <div id="allData"></div>
     
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h3>المستخدمين</h3>
-            <p id="totalUsers">جارٍ التحميل...</p>
-        </div>
-        <div class="stat-card">
-            <h3>الأسطوات</h3>
-            <p id="totalMechanics">جارٍ التحميل...</p>
-        </div>
-        <div class="stat-card" style="background: #008080;">
-            <h3>أكثر محافظة</h3>
-            <p id="topProvince">ميسان</p>
-        </div>
-    </div>
-
-    <h3>📝 قائمة المسجلين الجدد</h3>
-    <table class="user-list">
-        <thead>
-            <tr>
-                <th>الاسم</th>
-                <th>المحافظة</th>
-                <th>المهنة</th>
-                <th>إجراء</th>
-            </tr>
-        </thead>
-        <tbody id="userTable">
-            </tbody>
-    </table>
+    <button id="masterDeleteBtn" class="delete-all" style="display:none;" onclick="confirmMasterDelete()">⚠️ مسح قاعدة البيانات بالكامل (صلاحية ستار)</button>
 </div>
 
 <script>
-    function checkPass() {
+    // --- قسم الرموز (تستطيع تغييرها من هنا) ---
+    const CODES = {
+        MASTER: "satar1990", // رمز ستار
+        ADMIN1: "1122",     // مشرف 1
+        ADMIN2: "3344",     // مشرف 2
+        ADMIN3: "5566",     // مشرف 3
+        ADMIN4: "7788"      // مشرف 4
+    };
+
+    function checkAccess() {
         const pass = document.getElementById('adminPass').value;
-        if(pass === "1234") { // يمكنك تغيير الرمز السري من هنا
-            document.getElementById('adminLogin').style.display = 'none';
+        const values = Object.values(CODES);
+
+        if (values.includes(pass)) {
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            
+            // إذا كان الداخل هو ستار، يظهر له زر المسح الشامل
+            if (pass === CODES.MASTER) {
+                document.getElementById('masterDeleteBtn').style.display = 'block';
+            }
+            loadAdminData();
         } else {
-            alert("الرمز السري خطأ!");
+            alert("الرمز غير صحيح، يرجى التأكد من الرمز الخاص بك.");
         }
     }
 
-    // تجربة عرض بيانات وهمية لحين ربط Google Sheets
-    window.onload = () => {
-        document.getElementById('totalUsers').innerText = "154";
-        document.getElementById('totalMechanics').innerText = "42";
-        const table = document.getElementById('userTable');
-        table.innerHTML = `
-            <tr>
-                <td>ستار الساعدي</td>
-                <td>ميسان</td>
-                <td>سائق</td>
-                <td><button class="btn-action btn-delete">حظر</button></td>
-            </tr>
-        `;
+    function loadAdminData() {
+        const users = JSON.parse(localStorage.getItem('users') || "[]");
+        const list = document.getElementById('allData');
+        
+        if(users.length === 0) {
+            list.innerHTML = "<p>لا يوجد مستخدمين حالياً</p>";
+            return;
+        }
+
+        list.innerHTML = users.map((u, index) => `
+            <div class="user-row">
+                <div style="text-align: right;">
+                    <strong style="display:block;">${u.name}</strong>
+                    <span style="font-size:11px; color:#b89344;">${u.shop} - ${u.spec}</span>
+                </div>
+                <button class="btn-delete" onclick="deleteUser(${index})">حذف</button>
+            </div>
+        `).join('');
+    }
+
+    function deleteUser(index) {
+        if(confirm("هل أنت متأكد من حذف هذا الحساب؟")) {
+            let users = JSON.parse(localStorage.getItem('users') || "[]");
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadAdminData();
+        }
+    }
+
+    function confirmMasterDelete() {
+        if(confirm("تحذير: سيتم مسح كافة الأسطوات والسائقين من النظام! هل أنت متأكد؟")) {
+            localStorage.removeItem('users');
+            loadAdminData();
+        }
     }
 </script>
 </body>
