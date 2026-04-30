@@ -7,19 +7,19 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 15px; }
+        body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 15px; }
         .header { background: #002d5b; color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        .card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: right; }
-        .btn-call { display: block; background-color: #28a745; color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-right: 6px solid #002d5b; }
+        .btn { display: block; text-align: center; padding: 12px; margin-top: 8px; border-radius: 8px; text-decoration: none; font-weight: bold; color: white; }
+        .btn-call { background: #28a745; }
+        .btn-map { background: #ff9800; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>دليل أسطوات ديرتك 👷‍♂️</h1>
     </div>
-    <div id="workers-list">
-        <p style="text-align:center;">جاري تحميل الأسطوات...</p>
-    </div>
+    <div id="workers-list"></div>
 
     <script>
         const firebaseConfig = {
@@ -32,25 +32,22 @@
             appId: "1:553323569740:web:57075700fe68af3d010ae9"
         };
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.database();
 
-        database.ref('workers').on('value', (snapshot) => {
+        db.ref('workers').on('value', (snapshot) => {
             const listDiv = document.getElementById('workers-list');
             listDiv.innerHTML = '';
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const data = childSnapshot.val();
-                    listDiv.innerHTML += `
-                        <div class="card">
-                            <h3>الأسطى: ${data.name}</h3>
-                            <p>🔧 المهنة: ${data.job}</p>
-                            <a href="tel:${data.phone}" class="btn-call">📞 إتصل بالأسطى</a>
-                        </div>
-                    `;
-                });
-            } else {
-                listDiv.innerHTML = '<p style="text-align:center;">لا يوجد أسطوات حالياً.</p>';
-            }
+            snapshot.forEach((child) => {
+                const data = child.val();
+                listDiv.innerHTML += `
+                    <div class="card">
+                        <h3>الأسطى: ${data.name}</h3>
+                        <p>🔧 المهنة: ${data.job}</p>
+                        <a href="tel:${data.phone}" class="btn btn-call">📞 إتصل بالأسطى</a>
+                        <a href="https://www.google.com/maps?q=${data.lat},${data.lng}" target="_blank" class="btn btn-map">📍 موقع الأسطى على الخريطة</a>
+                    </div>
+                `;
+            });
         });
     </script>
 </body>
