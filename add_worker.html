@@ -1,12 +1,12 @@
 <script>
-    // ... كود الاتصال بـ Firebase ...
+    // ... تأكد من استخدام إعدادات Firebase الخاصة بك هنا ...
     function saveWorker() {
         const name = document.getElementById('name').value;
         const job = document.getElementById('job').value;
         const phone = document.getElementById('phone').value;
 
         if(name && job && phone) {
-            // نرسل البيانات إلى صندوق اسمه 'workers' ليتطابق مع صفحة العرض
+            // نرسل البيانات لصندوق 'workers' لضمان قراءتها في الصفحة الرئيسية
             database.ref('workers').push().set({
                 name: name,
                 job: job,
@@ -14,7 +14,7 @@
                 lat: "31.83", // إحداثيات العمارة الافتراضية
                 lng: "47.14"
             }).then(() => {
-                alert("✅ تم الحفظ بنجاح! تفقد الصفحة الرئيسية الآن.");
+                alert("✅ تم الحفظ! جرب تحديث الصفحة الرئيسية الآن.");
             });
         }
     }
