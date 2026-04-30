@@ -1,0 +1,16 @@
+{
+  "short_name": "دارجي",
+  "name": "دارجي - دليلك الموثوق في ميسان",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#002147",
+  "theme_color": "#002147"
+}
+
