@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دارجي - تسجيل الدخول</title>
     <meta name="description" content="تطبيق دارجي - دليل أسطوات ميسان والعراق">
-<meta name="keywords" content="دارجي, فيتر, كهربائي, أسطى, ميسان, تصليح سيارات">
-<meta name="author" content="ستار">
-
+    <meta name="keywords" content="دارجي, فيتر, كهربائي, أسطى, ميسان, تصليح سيارات">
+    <meta name="author" content="ستار">
     <link rel="manifest" href="manifest.json">
     <style>
         body { margin: 0; background: #002147; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
@@ -65,11 +64,27 @@
 </div>
 
 <script>
-    // حل مشكلة الشاشة البيضاء بتعريف المتغيرات أولاً
+    // المتغيرات الأساسية
     let userLat = 0;
     let userLng = 0;
+    let installer;
 
-    // تشغيل الـ GPS فور فتح الصفحة
+    // --- كود تفعيل زر تثبيت التطبيق ---
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        installer = e;
+    });
+
+    function checkInstall() {
+        if (installer) {
+            installer.prompt();
+        } else {
+            alert("التطبيق جاهز للتثبيت! يمكنك أيضاً الضغط على (الثلاث نقاط) في المتصفح واختيار 'تثبيت التطبيق'.");
+        }
+    }
+    // --------------------------------
+
+    // تشغيل الـ GPS
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(p => {
             userLat = p.coords.latitude;
@@ -95,43 +110,23 @@
     }
 
     function processLogin() {
-        // جلب البيانات مع حذف الفراغات الزائدة
         const name = document.getElementById('userName').value.trim();
-        const phone = document.getElementById('userPhone').value.trim();
-        const province = document.getElementById('userProvince').value;
         const role = document.getElementById('userRole').value;
 
-        // فحص المربعات الفارغة (نظام الحماية)
-        if (!name || !phone || !province || !role) {
-            alert("يا ستار، لازم تملي كل المربعات (الاسم، الهاتف، المحافظة) قبل الدخول!");
+        if (!name || !role) {
+            alert("يا ستار، يرجى ملء الحقول المطلوبة!");
             return;
         }
 
-        // فحص بيانات الأسطى والـ GPS
-        if (role === 'mechanic') {
-            const shop = document.getElementById('shopName').value.trim();
-            if (!shop) { alert("لطفاً اكتب اسم المحل!"); return; }
-            if (userLat === 0) { alert("انتظر ثانية حتى يلتقط الـ GPS موقع المحل!"); return; }
-        }
-
-        // حفظ البيانات
         const userData = {
             name: name,
-            phone: phone,
-            province: province,
+            phone: document.getElementById('userPhone').value,
             role: role,
-            shop: document.getElementById('shopName').value || "محل شخصي",
-            address: document.getElementById('shopAddress').value || "غير محدد",
-            spec: document.getElementById('specialty').value || "",
             lat: userLat,
             lng: userLng
         };
 
-        let users = JSON.parse(localStorage.getItem('users') || "[]");
-        users.push(userData);
-        localStorage.setItem('users', JSON.stringify(users));
-
-        // الانتقال لصفحة التطبيق الرئيسية
+        localStorage.setItem('currentUser', JSON.stringify(userData));
         window.location.href = "main_app.html";
     }
 </script>
