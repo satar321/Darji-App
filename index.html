@@ -47,8 +47,14 @@
 
     <button class="btn-entry" onclick="processLogin()">دخول النظام</button>
 </div>
+<div style="text-align: center; margin-top: 20px;">
+    <a href="admin.html" style="color: #bbb; text-decoration: none; font-size: 13px; font-weight: bold; border: 1px solid #444; padding: 5px 15px; border-radius: 20px;">
+        ⚙️ لوحة تحكم المشرفين
+    </a>
+</div>
 
 <script>
+
     let userLat = 0, userLng = 0;
 
     navigator.geolocation.getCurrentPosition(p => {
