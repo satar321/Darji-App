@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إضافة أسطى</title>
+    <title>تسجيل أسطى جديد</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
-<body style="font-family:sans-serif; text-align:center; padding:20px;">
-    <h2>إضافة أسطى وموقعه 🛠️</h2>
-    <input type="text" id="name" placeholder="اسم الأسطى" style="width:80%; padding:10px; margin:10px;">
-    <input type="text" id="job" placeholder="المهنة" style="width:80%; padding:10px; margin:10px;">
-    <input type="text" id="phone" placeholder="الموبايل" style="width:80%; padding:10px; margin:10px;">
-    <button onclick="save()" style="width:85%; padding:15px; background:#002d5b; color:white; border-radius:10px;">حفظ المعلومات والموقع</button>
-    <p id="st"></p>
+<body style="font-family: sans-serif; text-align: center; background-color: #f0f2f5; padding: 20px;">
+
+    <div style="background: white; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #002d5b;">سجل بياناتك كأُسطى 🛠️</h2>
+        <p style="font-size: 14px; color: #666;">سيتم حفظ موقعك الحالي تلقائياً لتظهر للزبائن في الخريطة</p>
+        
+        <input type="text" id="name" placeholder="اسمك الكامل" style="width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;">
+        <input type="text" id="job" placeholder="مهنتك (مثلاً: كهربائي)" style="width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;">
+        <input type="text" id="phone" placeholder="رقم الموبايل" style="width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;">
+        
+        <button onclick="autoRegister()" style="width: 95%; padding: 15px; background: #002d5b; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">تسجيل وحفظ البيانات</button>
+        
+        <p id="msg" style="margin-top: 15px; font-weight: bold;"></p>
+    </div>
 
     <script>
+        // إعدادات الربط مع قاعدة بياناتك
         const firebaseConfig = {
             apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
             authDomain: "darji-app-13348.firebaseapp.com",
@@ -28,21 +36,38 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function save() {
+        function autoRegister() {
             const name = document.getElementById('name').value;
             const job = document.getElementById('job').value;
             const phone = document.getElementById('phone').value;
+            const msg = document.getElementById('msg');
+
             if(name && job && phone) {
-                // نأخذ موقع العمارة الافتراضي لضمان الحفظ السريع
-                db.ref('workers').push().set({
-                    name: name,
-                    job: job,
-                    phone: phone,
-                    lat: "31.83", 
-                    lng: "47.14"
-                }).then(() => {
-                    document.getElementById('st').innerText = "✅ تم الحفظ! اذهب للصفحة الثانية الآن.";
+                msg.innerText = "⏳ جاري تحديد موقعك وحفظ البيانات...";
+                
+                // طلب الموقع الجغرافي وحفظه تلقائياً
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    // إرسال البيانات للمخزن الدائم
+                    db.ref('workers').push().set({
+                        name, job, phone, lat, lng,
+                        regTime: Date.now()
+                    }).then(() => {
+                        msg.style.color = "green";
+                        msg.innerText = "✅ تم تسجيلك بنجاح! بياناتك وموقعك محفوظان الآن.";
+                    });
+                }, (err) => {
+                    // في حال تعذر الوصول للـ GPS، نحفظ بموقع افتراضي لضمان عدم ضياع التسجيل
+                    db.ref('workers').push().set({
+                        name, job, phone, lat: "31.83", lng: "47.14"
+                    }).then(() => {
+                        msg.innerText = "✅ تم التسجيل (بموقع العمارة الافتراضي)";
+                    });
                 });
+            } else {
+                alert("يرجى إكمال البيانات أولاً!");
             }
         }
     </script>
