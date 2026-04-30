@@ -22,4 +22,36 @@
             alert("الرمز السري خطأ! تأكد من كتابة الرمز الصحيح.");
         }
     }
+     // هذه الدالة تعرض قائمة الأسطوات المسجلين في لوحة التحكم
+    function loadAdminData() {
+        const users = JSON.parse(localStorage.getItem('users') || "[]");
+        const list = document.getElementById('allData');
+        
+        if(users.length === 0) {
+            list.innerHTML = "<p style='color:#666; text-align:center;'>لا يوجد مستخدمين مسجلين حالياً</p>";
+            return;
+        }
+
+        list.innerHTML = users.map((u, index) => `
+            <div style="background:#f9f9f9; padding:12px; margin:10px 0; border-radius:10px; display:flex; justify-content:space-between; align-items:center; border-right:5px solid #002147; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <div style="text-align:right;">
+                    <strong style="display:block; color:#002147;">${u.name}</strong>
+                    <span style="font-size:12px; color:#b89344;">${u.shop} (${u.spec})</span>
+                    <span style="display:block; font-size:11px; color:#888;">📞 ${u.phone}</span>
+                </div>
+                <button onclick="deleteUser(${index})" style="background:#ff4757; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">حذف</button>
+            </div>
+        `).join('');
+    }
+
+    // هذه الدالة لحذف أي مستخدم من القائمة
+    function deleteUser(index) {
+        if(confirm("هل أنت متأكد من حذف هذا الحساب نهائياً؟")) {
+            let users = JSON.parse(localStorage.getItem('users') || "[]");
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadAdminData(); // تحديث القائمة بعد الحذف
+        }
+    }
+   
 </script>
