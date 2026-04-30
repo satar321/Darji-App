@@ -3,85 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل أسطوات ديرتك</title>
+    <title>دليل ديرتك - الفخامة والأمان</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 10px; }
-        .reg-box { background: #002d5b; color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; }
-        .input-style { width: 90%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; }
-        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 12px; border-right: 5px solid #002d5b; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-call { display: block; background: #28a745; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; margin-top: 10px; }
-        .btn-map { display: block; background: #ff9800; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; margin-top: 5px; }
+        :root {
+            --primary: #002d5b; /* أزرق ملكي */
+            --gold: #d4af37; /* ذهبي مطفي */
+            --bg: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #333; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, #004a99 100%); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+        .card { background: var(--glass); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.3); }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 12px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; background: #fff; transition: 0.3s; }
+        input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .btn-reg { background: var(--primary); color: white; }
+        .btn-reg:hover { background: #003d7a; transform: translateY(-2px); }
+        
+        /* كرت الأسطى الفخم */
+        .worker-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 18px; border-right: 8px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: 0.3s; }
+        .stars { color: var(--gold); font-size: 20px; margin: 10px 0; }
+        .comment-box { background: #f0f2f5; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 14px; border-right: 3px solid var(--gold); }
+        
+        /* لوحة الإدارة السرية */
+        .admin-trigger { position: fixed; bottom: 15px; left: 15px; width: 45px; height: 45px; background: rgba(0,0,0,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; z-index: 1000; }
+        #admin-panel { display: none; background: white; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; overflow-y: auto; padding: 30px; }
+        .stat-circle { width: 120px; height: 120px; border: 5px solid var(--gold); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px auto; color: var(--primary); }
+
+        #reg-section, #profile-section { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="reg-box">
-        <h2>سجل كأُسطى جديد 👷‍♂️</h2>
-        <input type="text" id="name" class="input-style" placeholder="اسمك الكامل">
-        <input type="text" id="job" class="input-style" placeholder="مهنتك">
-        <input type="text" id="phone" class="input-style" placeholder="رقم الموبايل">
-        <button onclick="autoRegister()" style="width: 95%; padding: 15px; background: #ff9800; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">تسجيل وحفظ بياناتي</button>
-        <p id="status" style="font-size: 13px; margin-top: 10px;"></p>
+<div class="admin-trigger" onclick="openAdmin()">ADM</div>
+
+<div class="header">
+    <h1 style="margin:0; letter-spacing: 1px;">👷‍♂️ دليل ديرتك</h1>
+    <p id="status-bar" style="opacity: 0.9;">سحابة جوجل قيد التحقق...</p>
+</div>
+
+<div class="container">
+    <div id="reg-section" class="card">
+        <h2>تسجيل هوية جديدة ✨</h2>
+        <input type="text" id="name" placeholder="الأسم الكامل (مثلاً: ستار علي)">
+        <input type="tel" id="phone" placeholder="رقم الموبايل العراقي">
+        
+        <select id="city">
+            <option value="">اختر المحافظة</option>
+            <option>بغداد</option><option>ميسان</option><option>البصرة</option><option>ذي قار</option>
+            <option>بابل</option><option>النجف</option><option>كربلاء</option><option>الأنبار</option>
+            <option>نينوى</option><option>واسط</option><option>القادسية</option><option>المثنى</option>
+            <option>ديالى</option><option>كركوك</option><option>صلاح الدين</option><option>أربيل</option>
+            <option>سليمانية</option><option>دهوك</option>
+        </select>
+
+        <select id="user-type" onchange="checkType()">
+            <option value="">نوع الحساب</option>
+            <option value="driver">سائق (أبحث عن خدمة)</option>
+            <option value="worker">أسطى (صاحب مهنة)</option>
+        </select>
+
+        <div id="worker-fields" style="display:none;">
+            <select id="job">
+                <option value="">حدد مهنتك</option>
+                <option>فيتر</option><option>كهربائي سيارات</option><option>بنجرجي</option>
+                <option>تبديل زيوت</option><option>غسل سيارات</option><option>حداد سيارات</option>
+                <option>صباغ سيارات</option><option>مصلح تبريد</option>
+            </select>
+            <input type="text" id="shop" placeholder="اسم المحل (اختياري)">
+            <input type="text" id="area" placeholder="المنطقة / الحي">
+        </div>
+
+        <button class="btn btn-reg" onclick="registerUser()">تثبيت الموقع وحفظ البيانات</button>
     </div>
 
-    <hr>
-    <h3 style="text-align: center; color: #002d5b;">دليل الأسطوات المسجلين</h3>
-    <div id="workers-list"></div>
+    <div id="profile-section" class="card" style="text-align:center;">
+        <h2 id="user-welcome">أهلاً بك</h2>
+        <p>بياناتك محفوظة في سحابة جوجل ✅</p>
+        <button class="btn btn-reg" onclick="updateGPS()">تحديث موقع المحل الحالي</button>
+        <button onclick="logout()" style="background:none; border:none; color:#888; margin-top:20px; cursor:pointer;">تسجيل خروج</button>
+    </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
-            authDomain: "darji-app-13348.firebaseapp.com",
-            databaseURL: "https://darji-app-13348-default-rtdb.firebaseio.com",
-            projectId: "darji-app-13348",
-            storageBucket: "darji-app-13348.firebasestorage.app",
-            messagingSenderId: "553323569740",
-            appId: "1:553323569740:web:57075700fe68af3d010ae9"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    <h2 style="text-align:center;">دليل النشامى المتوفرين</h2>
+    <div id="main-list"></div>
+</div>
 
-        // وظيفة التسجيل التلقائي مع الموقع
-        function autoRegister() {
-            const name = document.getElementById('name').value;
-            const job = document.getElementById('job').value;
-            const phone = document.getElementById('phone').value;
-            const status = document.getElementById('status');
+<div id="admin-panel">
+    <button onclick="closeAdmin()" style="background:var(--primary); color:white; padding:10px; border-radius:10px; border:none;">🔙 رجوع</button>
+    <h2 style="text-align:center;">لوحة التحكم الملكية</h2>
+    <div class="stat-circle">
+        <h2 id="total-users" style="margin:0; border:none;">0</h2>
+        <small>مستخدم</small>
+    </div>
+    <div id="admin-list"></div>
+</div>
 
-            if(name && job && phone) {
-                status.innerText = "⏳ جاري حفظ موقعك والبيانات...";
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    db.ref('workers').push().set({
-                        name, job, phone, 
-                        lat: pos.coords.latitude, 
-                        lng: pos.coords.longitude
-                    }).then(() => { status.innerText = "✅ تم التسجيل بنجاح!"; });
-                }, () => {
-                    db.ref('workers').push().set({ name, job, phone, lat: "31.83", lng: "47.14" })
-                    .then(() => { status.innerText = "✅ تم التسجيل (بموقع افتراضي)"; });
-                });
-            }
+<script>
+    // إعدادات السحابة
+    const firebaseConfig = {
+        apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
+        authDomain: "darji-app-13348.firebaseapp.com",
+        databaseURL: "https://darji-app-13348-default-rtdb.firebaseio.com",
+        projectId: "darji-app-13348",
+        storageBucket: "darji-app-13348.firebasestorage.app",
+        messagingSenderId: "553323569740",
+        appId: "1:553323569740:web:57075700fe68af3d010ae9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // رموز الدخول
+    const keys = { "satar1990": "full", "ahmed12345": "mod", "murtada54321": "mod", "ali98765": "mod", "jasim11223": "mod" };
+    let myRole = null;
+
+    window.onload = () => {
+        const saved = localStorage.getItem('darji_user');
+        if (saved) {
+            const u = JSON.parse(saved);
+            document.getElementById('profile-section').style.display = 'block';
+            document.getElementById('user-welcome').innerText = "أهلاً " + u.name;
+        } else {
+            document.getElementById('reg-section').style.display = 'block';
         }
+        syncData();
+    };
 
-        // وظيفة عرض البيانات فوراً (تحديث تلقائي)
-        db.ref('workers').on('value', (snapshot) => {
-            const listDiv = document.getElementById('workers-list');
-            listDiv.innerHTML = '';
-            snapshot.forEach((child) => {
-                const d = child.val();
-                listDiv.innerHTML += `
-                    <div class="card">
-                        <h3>الأسطى: ${d.name}</h3>
-                        <p>🔧 المهنة: ${d.job}</p>
-                        <a href="tel:${d.phone}" class="btn-call">📞 إتصل بالأسطى</a>
-                        <a href="https://www.google.com/maps?q=${d.lat},${d.lng}" target="_blank" class="btn-map">📍 موقع الأسطى على الخريطة</a>
-                    </div>
-                `;
+    function checkType() {
+        const val = document.getElementById('user-type').value;
+        document.getElementById('worker-fields').style.display = (val === 'worker') ? 'block' : 'none';
+    }
+
+    function registerUser() {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        if (!name || !phone) return alert("أكمل الاسم والهاتف");
+
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const uData = {
+                name, phone,
+                city: document.getElementById('city').value,
+                type: document.getElementById('user-type').value,
+                job: document.getElementById('job').value || "سائق",
+                shop: document.getElementById('shop').value || "-",
+                area: document.getElementById('area').value || "-",
+                lat: pos.coords.latitude, lng: pos.coords.longitude,
+                rating: 5, comments: []
+            };
+            const ref = db.ref('users').push();
+            ref.set(uData).then(() => {
+                uData.id = ref.key;
+                localStorage.setItem('darji_user', JSON.stringify(uData));
+                location.reload();
             });
+        }, () => alert("افتح الـ GPS لحفظ موقعك"));
+    }
+
+    function syncData() {
+        db.ref('users').on('value', (snap) => {
+            const list = document.getElementById('main-list');
+            const aList = document.getElementById('admin-list');
+            list.innerHTML = ''; aList.innerHTML = '';
+            let count = 0;
+
+            snap.forEach((child) => {
+                const d = child.val(); count++;
+                if (d.type === 'worker') {
+                    list.innerHTML += `
+                        <div class="worker-card">
+                            <h3>أسطى ${d.name} (${d.job})</h3>
+                            <div class="stars">⭐⭐⭐⭐⭐ (5/5)</div>
+                            <p>📍 ${d.city} - ${d.area} | 🏪 ${d.shop}</p>
+                            <a href="tel:${d.phone}" style="display:block; background:#28a745; color:white; text-align:center; padding:12px; border-radius:10px; text-decoration:none; font-weight:bold;">📞 إتصال بالأسطى</a>
+                            <div class="comment-box"><b>آخر تقييم:</b> "شغل ممتاز وأنصح به"</div>
+                            <textarea placeholder="أضف تعليقك هنا..." style="height:60px;"></textarea>
+                            <button class="btn btn-reg" style="padding:5px; font-size:14px;">إرسال تقييم</button>
+                        </div>`;
+                }
+                aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;">
+                    <b>${d.name}</b> (${d.phone}) - ${d.city}
+                    ${myRole ? `<button onclick="del('${child.key}')" style="background:red; color:white; border:none; float:left;">حذف</button>` : ''}
+                </div>`;
+            });
+            document.getElementById('total-users').innerText = count;
         });
-    </script>
+    }
+
+    function openAdmin() {
+        const p = prompt("رمز الإدارة:");
+        if (keys[p]) { myRole = keys[p]; document.getElementById('admin-panel').style.display = 'block'; }
+    }
+    function del(id) { if(confirm("حذف نهائي؟")) db.ref('users/' + id).remove(); }
+    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+    function logout() { localStorage.clear(); location.reload(); }
+    function updateGPS() {
+        const u = JSON.parse(localStorage.getItem('darji_user'));
+        navigator.geolocation.getCurrentPosition((pos) => {
+            db.ref('users/' + u.id).update({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            alert("تم تحديث موقعك السحابي!");
+        });
+    }
+</script>
 </body>
 </html>
-
