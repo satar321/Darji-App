@@ -25,4 +25,53 @@
         .map-link { color: #b89344; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; margin-top: 5px; }
         .online-dot { 
             width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; 
-            display: inline-block; margin-left: 8px; box-shadow: 0 0 5px #2ecc7
+            display: inline-block; margin-left: 8px; box-shadow: 0 0 5px #2ecc71;
+        }
+        .btn-call { 
+            background: #008080; color: white; padding: 10px 20px; border-radius: 10px; 
+            text-decoration: none; font-size: 14px; font-weight: bold; margin-right: 10px;
+        }
+        .no-data { text-align: center; color: #999; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h3 style="margin: 0;">أسطوات ديرتك في ميسان والعراق</h3>
+</div>
+
+<div class="container" id="usersList">
+    </div>
+
+<script>
+    window.onload = function() {
+        const listDiv = document.getElementById('usersList');
+        const allUsers = JSON.parse(localStorage.getItem('allUsers') || "[]");
+        
+        const mechanics = allUsers.filter(u => u.role === 'mechanic');
+
+        if (mechanics.length === 0) {
+            listDiv.innerHTML = '<p class="no-data">لا يوجد أسطوات مسجلين حالياً</p>';
+            return;
+        }
+
+        listDiv.innerHTML = mechanics.map(user => {
+            // تجهيز رابط الخريطة باستخدام الإحداثيات
+            const mapUrl = `https://www.google.com/maps?q=${user.lat},${user.lng}`;
+            
+            return `
+            <div class="card">
+                <div class="info">
+                    <strong><span class="online-dot"></span>الأسطى ${user.name} (${user.specialty})</strong>
+                    <p>📍 محافظة ${user.province}</p>
+                    <a href="${mapUrl}" target="_blank" class="map-link">📍 عرض الموقع على الخريطة</a>
+                </div>
+                <a href="tel:${user.phone}" class="btn-call">اتصال</a>
+            </div>
+            `;
+        }).reverse().join('');
+    }
+</script>
+
+</body>
+</html>
