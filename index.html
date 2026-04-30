@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل ديرتك - النسخة الذهبية المتكاملة</title>
+    <title>دليل ديرتك - نظام الإدارة الشامل</title>
     
-    <link rel="manifest" href="data:application/manifest+json,{'name':'دليل ديرتك','short_name':'ديرتك','start_url':'.','display':'standalone','background_color':'#002d5b','theme_color':'#002d5b'}">
-    <meta name="theme-color" content="#002d5b">
+    <link rel="manifest" href="data:application/manifest+json,{'name':'دليل ديرتك الشامل','short_name':'ديرتك','start_url':'/','display':'standalone','background_color':'#002d5b','theme_color':'#002d5b','icons':[{'src':'https://cdn-icons-png.flaticon.com/512/1042/1042390.png','sizes':'512x512','type':'image/png'}]}">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -19,232 +18,148 @@
             --gold: #d4af37;
             --success: #28a745;
             --danger: #e74c3c;
-            --warning: #ff9800;
-            --bg: #f0f2f5;
-            --white: #ffffff;
-            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --bg: #f8f9fa;
         }
 
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            margin: 0; 
-            padding: 0; 
-            color: #333;
-            user-select: none; /* حماية المحتوى من النسخ العشوائي */
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
 
-        /* زر تحميل البرنامج العلوي */
-        #install-banner { 
+        /* شريط تحميل التطبيق */
+        #install-bar { 
             display: none; 
-            background: linear-gradient(to right, var(--gold), #f1c40f); 
+            background: var(--gold); 
             color: var(--primary); 
-            text-align: center; 
             padding: 15px; 
+            text-align: center; 
             font-weight: bold; 
-            cursor: pointer; 
-            border: none; 
-            width: 100%; 
-            font-size: 16px; 
-            position: sticky; 
+            position: fixed; 
             top: 0; 
-            z-index: 5000; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%; 
+            z-index: 10000; 
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .header { 
-            background: linear-gradient(135deg, var(--primary) 0%, #004a99 100%); 
+            background: linear-gradient(135deg, var(--primary), #004a99); 
             color: white; 
-            padding: 60px 20px; 
+            padding: 50px 20px; 
             text-align: center; 
-            border-radius: 0 0 50px 50px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            position: relative;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
         }
 
-        .header h1 { margin: 0; font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .header p { opacity: 0.9; font-size: 1.1rem; margin-top: 10px; }
-
-        .container { max-width: 550px; margin: auto; padding: 20px; position: relative; top: -30px; }
+        .container { max-width: 600px; margin: -30px auto 0; padding: 20px; }
 
         .card { 
-            background: var(--white); 
-            padding: 35px; 
-            border-radius: 30px; 
-            box-shadow: var(--shadow); 
-            margin-bottom: 30px; 
-            border: 1px solid rgba(0,0,0,0.02);
-            transition: 0.3s ease-in-out;
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
         }
-
-        h2 { color: var(--primary); border-right: 5px solid var(--gold); padding-right: 15px; margin-bottom: 30px; font-size: 1.5rem; }
 
         input, select, textarea { 
-            width: 100%; 
-            padding: 16px; 
-            margin: 15px 0; 
-            border: 2px solid #eee; 
-            border-radius: 18px; 
-            font-size: 16px; 
-            box-sizing: border-box; 
-            transition: 0.3s;
-            background: #fdfdfd;
+            width: 100%; padding: 15px; margin: 10px 0; 
+            border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; 
         }
-
-        input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 15px rgba(0,45,91,0.1); }
 
         .btn { 
-            width: 100%; 
-            padding: 20px; 
-            border: none; 
-            border-radius: 18px; 
-            font-weight: bold; 
-            font-size: 18px; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
+            width: 100%; padding: 18px; border: none; border-radius: 12px; 
+            font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; 
         }
 
-        .btn-reg { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(0,45,91,0.3); }
-        .btn-reg:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,45,91,0.4); }
+        .btn-main { background: var(--primary); color: white; }
 
-        /* تصميم كرت الأسطى الملكي */
+        /* كروت العرض */
         .worker-card { 
-            background: var(--white); 
-            padding: 30px; 
-            margin-bottom: 30px; 
-            border-radius: 25px; 
-            border-right: 12px solid var(--primary); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.06); 
-            position: relative;
-            overflow: hidden;
+            background: white; padding: 20px; border-radius: 15px; 
+            border-right: 8px solid var(--primary); margin-bottom: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
-        .worker-card::after { content: '✓ موثوق'; position: absolute; top: 15px; left: -30px; background: var(--success); color: white; padding: 5px 40px; transform: rotate(-45deg); font-size: 12px; font-weight: bold; }
-
-        .stars { color: var(--gold); font-size: 26px; margin: 15px 0; letter-spacing: 2px; }
-        .btn-call { background: var(--success); color: white; margin-top: 20px; }
-        .btn-map { background: var(--warning); color: white; margin-top: 12px; }
-
-        .rating-section { 
-            background: #f9f9fb; 
-            padding: 20px; 
-            border-radius: 20px; 
-            margin-top: 25px; 
-            border: 1px dashed #ddd;
-        }
-
-        /* لوحة الإدارة والمشرفين */
-        .admin-btn { 
-            position: fixed; 
-            bottom: 35px; 
-            left: 35px; 
-            width: 70px; 
-            height: 70px; 
-            background: var(--primary); 
-            color: white; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            cursor: pointer; 
-            z-index: 1000; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
-            border: 4px solid var(--white);
-            transition: 0.4s;
-        }
-
-        .admin-btn:hover { transform: scale(1.1) rotate(15deg); }
-
+        /* لوحة الإدارة المطورة */
         #admin-panel { 
-            display: none; 
-            background: var(--white); 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: 9999; 
-            overflow-y: auto; 
-            padding: 50px 25px; 
-            box-sizing: border-box; 
+            display: none; background: #fff; position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 9999; overflow-y: auto; padding: 20px; box-sizing: border-box; 
         }
 
-        .admin-header { background: var(--primary); color: white; padding: 40px; border-radius: 25px; text-align: center; margin-bottom: 40px; box-shadow: var(--shadow); }
-        .delete-btn { background: var(--danger); color: white; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .delete-btn:hover { background: #c0392b; }
+        .admin-item { 
+            background: #f9f9f9; padding: 20px; border-radius: 15px; 
+            margin-bottom: 15px; border: 1px solid #eee; font-size: 14px; 
+        }
+
+        .location-info { 
+            background: #eef2f7; padding: 10px; border-radius: 8px; 
+            margin-top: 10px; color: #555; border: 1px solid #d1d9e6;
+        }
+
+        .tag-driver { background: #3498db; color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
+        .tag-worker { background: #9b59b6; color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
+
+        .admin-trigger { 
+            position: fixed; bottom: 20px; left: 20px; 
+            width: 60px; height: 60px; background: var(--primary); 
+            color: white; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; 
+        }
 
         #reg-section, #profile-section { display: none; }
     </style>
 </head>
 <body>
 
-<button id="install-banner" onclick="executeInstall()">📥 اضغط هنا لتثبيت "دليل ديرتك" كبرنامج على موبايلك</button>
+<div id="install-bar" onclick="installApp()">📥 اضغط هنا لتحميل تطبيق "دليل ديرتك" على هاتفك</div>
 
-<div class="admin-btn" onclick="requestAdminAccess()">إدارة</div>
+<div class="admin-trigger" onclick="openAdmin()">إدارة</div>
 
 <div class="header">
-    <h1>🇮🇶 دليل ديرتك</h1>
-    <p>أكبر تجمع للسواق وأصحاب المهن في ميسان</p>
+    <h1>👷‍♂️ دليل ديرتك</h1>
+    <p>نظام ميسان لإدارة المهن والسواق</p>
 </div>
 
 <div class="container">
     <div id="reg-section" class="card">
-        <h2 style="text-align:center;">انضم إلينا الآن ✨</h2>
-        <input type="text" id="u-name-input" placeholder="الأسم الكامل (مثلاً: أسطى ستار)">
-        <input type="tel" id="u-phone-input" placeholder="رقم الموبايل (واتساب)">
-        
-        <select id="u-city-input">
-            <option value="">اختر محافظتك</option>
-            <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>ذي قار</option>
-            <option>بابل</option><option>النجف</option><option>كربلاء</option><option>واسط</option>
-            <option>الأنبار</option><option>نينوى</option><option>القادسية</option><option>المثنى</option>
-            <option>ديالى</option><option>كركوك</option><option>صلاح الدين</option><option>أربيل</option>
+        <h2 style="text-align:center;">تسجيل جديد</h2>
+        <input type="text" id="in-name" placeholder="الأسم الكامل">
+        <input type="tel" id="in-phone" placeholder="رقم الهاتف">
+        <select id="in-city">
+            <option>ميسان</option><option>بغداد</option><option>البصرة</option>
         </select>
-
-        <select id="u-type-input" onchange="handleTypeChange()">
-            <option value="driver">سائق (أبحث عن خدمة)</option>
-            <option value="worker">أسطى (صاحب مهنة)</option>
+        <select id="in-type" onchange="toggleJob()">
+            <option value="driver">سائق</option>
+            <option value="worker">صاحب مهنة</option>
         </select>
-
-        <div id="extra-worker-data" style="display:none;">
-            <input type="text" id="u-job-input" placeholder="ما هي مهنتك؟ (مثلاً: فيتر)">
-            <input type="text" id="u-shop-input" placeholder="اسم المحل أو الورشة">
-            <input type="text" id="u-area-input" placeholder="المنطقة / الحي السكني">
+        <div id="job-fields" style="display:none;">
+            <input type="text" id="in-job" placeholder="المهنة">
+            <input type="text" id="in-shop" placeholder="اسم المحل">
+            <input type="text" id="in-area" placeholder="المنطقة">
         </div>
-
-        <button class="btn btn-reg" onclick="processCloudRegistration()">
-            <span>تثبيت البيانات عبر GPS</span> 📍
-        </button>
+        <button class="btn btn-main" onclick="saveUser()">حفظ وتثبيت الموقع</button>
     </div>
 
     <div id="profile-section" class="card" style="text-align:center;">
-        <h2 id="display-user-name">أهلاً بك يا بطل</h2>
-        <p style="color: #666; margin-bottom: 30px;">حسابك موثق وموقعك محفوظ في سحابة جوجل</p>
-        <button class="btn btn-reg" onclick="updateLocationCloud()">تحديث موقعي الحالي (GPS)</button>
-        <button onclick="clearSystemData()" style="background:none; border:none; color:var(--danger); margin-top:40px; cursor:pointer; font-weight:bold; font-size:16px;">تسجيل خروج نهائي</button>
+        <h2 id="hello-user">أهلاً بك</h2>
+        <button class="btn btn-main" onclick="updateLoc()">تحديث الموقع الآن</button>
+        <button onclick="logout()" style="margin-top:20px; background:none; border:none; color:red; cursor:pointer;">خروج</button>
     </div>
 
-    <h2 style="text-align:center; color: var(--primary); width: 100%; border:none;">🛠️ دليل النشامى المتاحين</h2>
-    <div id="public-worker-list"></div>
+    <h2 style="text-align:center; color: var(--primary);">قائمة المهنيين</h2>
+    <div id="display-list"></div>
 </div>
 
 <div id="admin-panel">
-    <button onclick="closeAdminPanel()" style="background:#f0f2f5; border:none; padding:15px 30px; border-radius:15px; cursor:pointer; font-weight:bold; margin-bottom:30px;">🔙 العودة للرئيسية</button>
-    <div class="admin-header">
-        <h1 id="total-users-count" style="margin:0; font-size:60px;">0</h1>
-        <p>إجمالي عدد المشتركين في النظام</p>
+    <button onclick="closeAdmin()" style="padding:10px 20px; border-radius:10px; border:none; background:#eee; cursor:pointer;">🔙 إغلاق</button>
+    <div style="text-align:center; background: var(--primary); color:white; padding:20px; border-radius:15px; margin:20px 0;">
+        <h1 id="count" style="margin:0;">0</h1>
+        <p>إجمالي المشتركين</p>
     </div>
-    <div id="admin-entries-container"></div>
+    <div id="admin-list"></div>
 </div>
 
 <script>
-    // تكوين سحابة جوجل Firebase - النسخة المستقرة
+    // تهيئة Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
         authDomain: "darji-app-13348.firebaseapp.com",
@@ -255,133 +170,114 @@
         appId: "1:553323569740:web:57075700fe68af3d010ae9"
     };
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.database();
 
-    // نظام التثبيت (تحميل البرنامج)
-    let installPrompt;
+    // إدارة زر التحميل
+    let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); installPrompt = e;
-        document.getElementById('install-banner').style.display = 'block';
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('install-bar').style.display = 'block';
     });
 
-    function executeInstall() {
-        if (!installPrompt) return;
-        installPrompt.prompt();
-        installPrompt.userChoice.then((choice) => {
-            if (choice.outcome === 'accepted') document.getElementById('install-banner').style.display = 'none';
+    function installApp() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+            if (choice.outcome === 'accepted') document.getElementById('install-bar').style.display = 'none';
         });
     }
 
-    // الأمان والمشرفين
-    const moderators = { "satar1990": "admin", "ahmed12345": "mod", "murtada54321": "mod", "ali98765": "mod", "jasim11223": "mod" };
-    let isManager = false;
-
     window.onload = () => {
-        const localUser = localStorage.getItem('satar_pro_user');
-        if (localUser) {
-            const u = JSON.parse(localUser);
+        const user = localStorage.getItem('app_user');
+        if (user) {
             document.getElementById('profile-section').style.display = 'block';
-            document.getElementById('display-user-name').innerText = "أهلاً " + u.name;
+            document.getElementById('hello-user').innerText = "أهلاً " + JSON.parse(user).name;
         } else {
             document.getElementById('reg-section').style.display = 'block';
         }
-        syncDataFromCloud();
+        loadData();
     };
 
-    function handleTypeChange() {
-        const type = document.getElementById('u-type-input').value;
-        document.getElementById('extra-worker-data').style.display = (type === 'worker') ? 'block' : 'none';
+    function toggleJob() {
+        document.getElementById('job-fields').style.display = (document.getElementById('in-type').value === 'worker') ? 'block' : 'none';
     }
 
-    function processCloudRegistration() {
-        const name = document.getElementById('u-name-input').value;
-        const phone = document.getElementById('u-phone-input').value;
-        if(!name || !phone) return alert("يرجى إدخال الأسم ورقم الهاتف للمتابعة");
+    function saveUser() {
+        const name = document.getElementById('in-name').value;
+        const phone = document.getElementById('in-phone').value;
+        if(!name || !phone) return alert("املأ الحقول");
 
         navigator.geolocation.getCurrentPosition((pos) => {
-            const newUser = {
+            const uData = {
                 name, phone,
-                city: document.getElementById('u-city-input').value,
-                type: document.getElementById('u-type-input').value,
-                job: document.getElementById('u-job-input').value || "سائق",
-                shop: document.getElementById('u-shop-input').value || "-",
-                area: document.getElementById('u-area-input').value || "-",
+                city: document.getElementById('in-city').value,
+                type: document.getElementById('in-type').value,
+                job: document.getElementById('in-job').value || "-",
+                shop: document.getElementById('in-shop').value || "-",
+                area: document.getElementById('in-area').value || "-",
                 lat: pos.coords.latitude,
                 lng: pos.coords.longitude,
-                regDate: new Date().toLocaleDateString()
+                time: new Date().toLocaleString()
             };
-            const pushRef = database.ref('users').push();
-            pushRef.set(newUser).then(() => {
-                newUser.id = pushRef.key;
-                localStorage.setItem('satar_pro_user', JSON.stringify(newUser));
+            const ref = db.ref('users').push();
+            ref.set(uData).then(() => {
+                uData.id = ref.key;
+                localStorage.setItem('app_user', JSON.stringify(uData));
                 location.reload();
             });
-        }, () => alert("تنبيه: يجب تفعيل الـ GPS لتتمكن من التسجيل وتثبيت موقعك"));
-    }
-
-    function syncDataFromCloud() {
-        database.ref('users').on('value', (snapshot) => {
-            const publicList = document.getElementById('public-worker-list');
-            const adminList = document.getElementById('admin-entries-container');
-            publicList.innerHTML = ''; adminList.innerHTML = '';
-            let total = 0;
-
-            snapshot.forEach((child) => {
-                const item = child.val();
-                total++;
-                if (item.type === 'worker') {
-                    publicList.innerHTML += `
-                        <div class="worker-card">
-                            <h3 style="margin:0; color:var(--primary); font-size:1.4rem;">الأسطى ${item.name} (${item.job})</h3>
-                            <div class="stars">⭐⭐⭐⭐⭐</div>
-                            <p style="margin:10px 0;">📍 ${item.city} - ${item.area} | 🏪 ${item.shop}</p>
-                            <a href="tel:${item.phone}" class="btn btn-call">📞 إتصال بالأسطى</a>
-                            <a href="https://www.google.com/maps?q=${item.lat},${item.lng}" target="_blank" class="btn btn-map">📍 موقع المحل على الخريطة</a>
-                            <div class="rating-section">
-                                <b style="color:var(--primary);">التقييمات:</b> "خدمة ممتازة جداً وأسعار مناسبة"
-                                <textarea placeholder="أضف تجربتك مع هذا الأسطى..." style="height:60px; margin-top:15px;"></textarea>
-                                <button class="btn btn-reg" style="padding:10px; font-size:14px; width:130px; margin-top:10px;">إرسال التقييم</button>
-                            </div>
-                        </div>`;
-                }
-                adminList.innerHTML += `
-                    <div style="padding:25px; border-bottom:1.5px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:10px; border-radius:15px;">
-                        <span>
-                            <b style="font-size:18px;">${item.name}</b> (${item.job})<br>
-                            <small style="color:#888;">الهاتف: ${item.phone} | النوع: ${item.type}</small>
-                        </span>
-                        ${isManager ? `<button class="delete-btn" onclick="purgeEntry('${child.key}')">حذف نهائي</button>` : ''}
-                    </div>`;
-            });
-            document.getElementById('total-users-count').innerText = total;
         });
     }
 
-    function requestAdminAccess() {
-        const key = prompt("نظام الإدارة - أدخل الرمز السري:");
-        if (moderators[key]) {
-            isManager = true;
-            document.getElementById('admin-panel').style.display = 'block';
-            syncDataFromCloud();
-        } else { alert("عذراً، الرمز غير صحيح!"); }
+    let isAdmin = false;
+    function loadData() {
+        db.ref('users').on('value', (snap) => {
+            const dList = document.getElementById('display-list');
+            const aList = document.getElementById('admin-list');
+            dList.innerHTML = ''; aList.innerHTML = '';
+            let c = 0;
+            snap.forEach((child) => {
+                const v = child.val(); c++;
+                if (v.type === 'worker') {
+                    dList.innerHTML += `<div class="worker-card">
+                        <h3>${v.name} (${v.job})</h3>
+                        <p>📍 ${v.city} - ${v.area}</p>
+                        <a href="tel:${v.phone}" class="btn btn-main" style="display:block; text-align:center; text-decoration:none;">إتصال</a>
+                        <a href="https://www.google.com/maps?q=${v.lat},${v.lng}" target="_blank" style="display:block; margin-top:10px; text-align:center;">فتح الموقع على الخريطة</a>
+                    </div>`;
+                }
+                // عرض بيانات الموقع كاملة للأدمن
+                aList.innerHTML += `<div class="admin-item">
+                    <span class="${v.type === 'driver' ? 'tag-driver' : 'tag-worker'}">${v.type === 'driver' ? 'سائق' : 'مهني'}</span>
+                    <h3 style="margin:10px 0;">${v.name} | ${v.phone}</h3>
+                    <p><b>المدينة:</b> ${v.city} | <b>المنطقة:</b> ${v.area}</p>
+                    <div class="location-info">
+                        <b>إحداثيات الموقع الكاملة:</b><br>
+                        خط العرض: ${v.lat}<br>
+                        خط الطول: ${v.lng}<br>
+                        <b>وقت التسجيل:</b> ${v.time}
+                    </div>
+                    ${isAdmin ? `<button onclick="del('${child.key}')" style="background:red; color:white; border:none; padding:8px; border-radius:5px; margin-top:10px; cursor:pointer;">حذف الحساب</button>` : ''}
+                </div>`;
+            });
+            document.getElementById('count').innerText = c;
+        });
     }
 
-    function purgeEntry(key) {
-        if(confirm("هل أنت متأكد من حذف هذا المشترك نهائياً من قاعدة البيانات؟")) {
-            database.ref('users/' + key).remove();
-        }
+    function openAdmin() {
+        const p = prompt("رمز الدخول:");
+        if (p === "satar1990") { isAdmin = true; document.getElementById('admin-panel').style.display = 'block'; loadData(); }
+        else alert("خطأ!");
     }
 
-    function closeAdminPanel() { document.getElementById('admin-panel').style.display = 'none'; }
-    function clearSystemData() { if(confirm("هل تريد تسجيل الخروج؟")) { localStorage.clear(); location.reload(); } }
-    
-    function updateLocationCloud() {
-        const local = JSON.parse(localStorage.getItem('satar_pro_user'));
+    function del(k) { if(confirm("حذف؟")) db.ref('users/'+k).remove(); }
+    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+    function logout() { localStorage.clear(); location.reload(); }
+    function updateLoc() {
+        const u = JSON.parse(localStorage.getItem('app_user'));
         navigator.geolocation.getCurrentPosition((p) => {
-            database.ref('users/' + local.id).update({
-                lat: p.coords.latitude,
-                lng: p.coords.longitude
-            }).then(() => alert("نجاح: تم تحديث إحداثيات موقعك في السحابة"));
+            db.ref('users/'+u.id).update({ lat: p.coords.latitude, lng: p.coords.longitude });
+            alert("تم التحديث!");
         });
     }
 </script>
