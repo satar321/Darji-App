@@ -2,65 +2,89 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم - دارجي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الإدارة - دارجي</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
-        .stat-card { background: #001f3f; color: white; padding: 15px; border-radius: 15px; display: inline-block; margin-bottom: 20px; }
-        table { width: 100%; background: white; border-radius: 10px; border-collapse: collapse; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        th { background: #b89c44; color: white; padding: 12px; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .admin-container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #002147; display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .stat-card { background: #b89344; color: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .user-list { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .user-list th, .user-list td { padding: 12px; border: 1px solid #ddd; text-align: right; }
+        .btn-action { padding: 5px 10px; border-radius: 5px; cursor: pointer; border: none; }
+        .btn-delete { background: #e74c3c; color: white; }
     </style>
 </head>
 <body>
-    <div id="loginArea" style="margin-top: 100px;">
-        <h2>بوابة المشرفين والمدير</h2>
-        <input type="password" id="pInput" placeholder="أدخل الرمز السري الخاص" style="padding:10px; border-radius:8px; border:1px solid #ccc;">
-        <button onclick="login()" style="padding:10px 20px; background:#b89c44; color:white; border:none; border-radius:8px; cursor:pointer;">دخول</button>
+
+<div id="adminLogin" class="login-overlay">
+    <div style="background: white; padding: 30px; border-radius: 20px; text-align: center;">
+        <h3>دخول المشرفين</h3>
+        <input type="password" id="adminPass" placeholder="أدخل الرمز السري" style="padding: 10px; width: 80%; border-radius: 5px; border: 1px solid #ddd;">
+        <br><br>
+        <button onclick="checkPass()" style="background: #b89344; color: white; border: none; padding: 10px 30px; border-radius: 10px;">دخول</button>
+    </div>
+</div>
+
+<div class="admin-container">
+    <h2>📊 لوحة تحكم دارجي</h2>
+    <hr>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>المستخدمين</h3>
+            <p id="totalUsers">جارٍ التحميل...</p>
+        </div>
+        <div class="stat-card">
+            <h3>الأسطوات</h3>
+            <p id="totalMechanics">جارٍ التحميل...</p>
+        </div>
+        <div class="stat-card" style="background: #008080;">
+            <h3>أكثر محافظة</h3>
+            <p id="topProvince">ميسان</p>
+        </div>
     </div>
 
-    <div id="dashboard" style="display:none;">
-        <div class="stat-card">المستخدمين المسجلين: <b id="total">0</b></div>
-        <table id="uTable">
-            <thead>
-                <tr>
-                    <th>الاسم</th>
-                    <th>الفئة</th>
-                    <th>المهنة</th>
-                    <th>الموقع</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <h3>📝 قائمة المسجلين الجدد</h3>
+    <table class="user-list">
+        <thead>
+            <tr>
+                <th>الاسم</th>
+                <th>المحافظة</th>
+                <th>المهنة</th>
+                <th>إجراء</th>
+            </tr>
+        </thead>
+        <tbody id="userTable">
+            </tbody>
+    </table>
+</div>
 
-    <script>
-        // رموز معقدة ومختلفة للمشرفين والمدير
-        const keys = {
-            "Star@Master#2026": "المدير العام",
-            "M1_Z_99X": "المشرف 1",
-            "M2_R_77Y": "المشرف 2",
-            "M3_M_44Z": "المشرف 3",
-            "M4_B_11W": "المشرف 4"
-        };
-
-        function login() {
-            const pass = document.getElementById('pInput').value;
-            if (keys[pass]) {
-                document.getElementById('loginArea').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                loadUsers(pass === "Star@Master#2026");
-            } else { alert("الرمز غير صحيح!"); }
+<script>
+    function checkPass() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass === "1234") { // يمكنك تغيير الرمز السري من هنا
+            document.getElementById('adminLogin').style.display = 'none';
+        } else {
+            alert("الرمز السري خطأ!");
         }
+    }
 
-        function loadUsers(isAdmin) {
-            const data = JSON.parse(localStorage.getItem('darji_final') || "[]");
-            document.getElementById('total').innerText = data.length;
-            const body = document.querySelector("#uTable tbody");
-            data.reverse().forEach(u => {
-                const map = isAdmin ? `<a href="https://www.google.com/maps?q=${u.loc}" target="_blank">📍 عرض</a>` : "🔒 محجوب";
-                body.innerHTML += `<tr><td>${u.name}</td><td>${u.type}</td><td>${u.job}</td><td>${map}</td></tr>`;
-            });
-        }
-    </script>
+    // تجربة عرض بيانات وهمية لحين ربط Google Sheets
+    window.onload = () => {
+        document.getElementById('totalUsers').innerText = "154";
+        document.getElementById('totalMechanics').innerText = "42";
+        const table = document.getElementById('userTable');
+        table.innerHTML = `
+            <tr>
+                <td>ستار الساعدي</td>
+                <td>ميسان</td>
+                <td>سائق</td>
+                <td><button class="btn-action btn-delete">حظر</button></td>
+            </tr>
+        `;
+    }
+</script>
 </body>
 </html>
