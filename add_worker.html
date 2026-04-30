@@ -3,27 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إضافة أسطى - ديرتك</title>
+    <title>دليل أسطوات ديرتك</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; padding: 20px; text-align: center; }
-        .box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        .btn { width: 95%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; color: white; margin: 5px 0; }
-        .btn-save { background-color: #002d5b; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 15px; }
+        .header { background: linear-gradient(135deg, #002d5b, #0056b3); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-right: 5px solid #002d5b; }
+        .btn { display: block; text-align: center; padding: 10px; margin-top: 10px; border-radius: 8px; text-decoration: none; font-weight: bold; color: white; }
+        .btn-phone { background-color: #28a745; }
+        .btn-map { background-color: #ff9800; }
     </style>
 </head>
 <body>
-
-    <div class="box">
-        <h2>تسجيل أسطى جديد 👷‍♂️</h2>
-        <input type="text" id="name" placeholder="اسم الأسطى">
-        <input type="text" id="job" placeholder="المهنة (مثلاً: ميكانيكي)">
-        <input type="text" id="phone" placeholder="رقم الموبايل">
-        <p style="font-size: 13px; color: #666;">سيتم إضافة موقعك (العمارة) تلقائياً</p>
-        <button class="btn btn-save" onclick="saveWorker()">حفظ ونشر في الدليل</button>
-        <p id="msg"></p>
+    <div class="header">
+        <h1>دليل أسطوات ديرتك 👷‍♂️</h1>
+    </div>
+    <div id="workers-list">
+        <p style="text-align:center;">جاري البحث عن الأسطوات...</p>
     </div>
 
     <script>
@@ -37,35 +34,29 @@
             appId: "1:553323569740:web:57075700fe68af3d010ae9",
             measurementId: "G-CS76QJJ60J"
         };
-
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const database = firebase.database();
 
-        function saveWorker() {
-            const name = document.getElementById('name').value;
-            const job = document.getElementById('job').value;
-            const phone = document.getElementById('phone').value;
-            const msg = document.getElementById('msg');
-
-            if(name && job && phone) {
-                // نرسل البيانات بنفس الأسماء التي يتوقعها كود العرض (lat و lng)
-                db.ref('workers').push().set({
-                    name: name,
-                    job: job,
-                    phone: phone,
-                    lat: "31.83", // موقع افتراضي للعمارة لسهولة الحفظ
-                    lng: "47.14"
-                }).then(() => {
-                    msg.style.color = "green";
-                    msg.innerText = "✅ تم الحفظ! اذهب للصفحة الثانية لتراها.";
-                    document.getElementById('name').value = '';
-                    document.getElementById('job').value = '';
-                    document.getElementById('phone').value = '';
+        // التحدث مع المخزن (صندوق workers)
+        database.ref('workers').on('value', (snapshot) => {
+            const listDiv = document.getElementById('workers-list');
+            listDiv.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    listDiv.innerHTML += `
+                        <div class="card">
+                            <h3>الأسطى: ${data.name}</h3>
+                            <p>🔧 المهنة: ${data.job}</p>
+                            <a href="tel:${data.phone}" class="btn btn-phone">📞 إتصل بالأسطى</a>
+                            <a href="https://www.google.com/maps?q=${data.lat || '31.83'},${data.lng || '47.14'}" class="btn btn-map" target="_blank">📍 موقع الأسطى (الخريطة)</a>
+                        </div>
+                    `;
                 });
             } else {
-                msg.innerText = "⚠️ أكمل البيانات أولاً!";
+                listDiv.innerHTML = '<div class="card"><p style="text-align:center;">لا يوجد أسطوات مسجلين حالياً بالرمز المطلوب.</p></div>';
             }
-        }
+        });
     </script>
 </body>
 </html>
