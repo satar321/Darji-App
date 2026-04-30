@@ -3,53 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - قائمة الأسطوات</title>
+    <title>دليل أسطوات ديرتك</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <style>
-        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        .header { background: #002147; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .container { padding: 12px; }
-        .card { 
-            background: white; padding: 15px; margin-bottom: 12px; border-radius: 15px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-right: 6px solid #b89344;
-        }
-        .info strong { display: block; color: #002147; font-size: 16px; }
-        .info p { margin: 3px 0; font-size: 13px; color: #666; }
-        .shop-tag { color: #b89344; font-weight: bold; font-size: 14px; display: block; margin-top: 2px; }
-        .btn-call { background: #008080; color: white; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 14px; }
-        .map-btn { color: #b89344; font-size: 12px; text-decoration: none; font-weight: bold; display: block; margin-top: 8px; }
-        .online-dot { width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; display: inline-block; margin-left: 5px; box-shadow: 0 0 5px #2ecc71; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; text-align: center; }
+        .header { background-color: #002d5b; color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .card { background: white; padding: 15px; margin: 10px auto; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 400px; }
+        .loading { color: #666; font-style: italic; }
     </style>
 </head>
 <body>
 
-<div class="header"><h3>دليل أسطوات ديرتك</h3></div>
-<div class="container" id="list"></div>
+    <div class="header">
+        <h1>دليل أسطوات ديرتك</h1>
+    </div>
 
-<script>
-    window.onload = function() {
-        const users = JSON.parse(localStorage.getItem('users') || "[]");
-        const mechanics = users.filter(u => u.role === 'mechanic');
-        const listDiv = document.getElementById('list');
+    <div id="workers-list">
+        <p class="loading">جاري تحميل قائمة الأسطوات...</p>
+    </div>
 
-        if(mechanics.length === 0) {
-            listDiv.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">لا يوجد أسطوات مسجلين حالياً</p>';
-            return;
-        }
+    <script>
+        // إعدادات Firebase الخاصة بك التي ظهرت في الصورة
+        const firebaseConfig = {
+            apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
+            authDomain: "darji-app-13348.firebaseapp.com",
+            databaseURL: "https://darji-app-13348-default-rtdb.firebaseio.com",
+            projectId: "darji-app-13348",
+            storageBucket: "darji-app-13348.firebasestorage.app",
+            messagingSenderId: "553323569740",
+            appId: "1:553323569740:web:57075700fe68af3d010ae9"
+        };
 
-        listDiv.innerHTML = mechanics.map(u => `
-            <div class="card">
-                <div class="info">
-                    <strong><span class="online-dot"></span>الأسطى ${u.name}</strong>
-                    <span class="shop-tag">🏪 ${u.shop} (${u.spec})</span>
-                    <p>🏠 العنوان: ${u.address}</p>
-                    <p>📍 محافظة ${u.province}</p>
-                    <a href="https://www.google.com/maps?q=${u.lat},${u.lng}" target="_blank" class="map-btn">📍 عرض موقع المحل على الخريطة</a>
-                </div>
-                <a href="tel:${u.phone}" class="btn-call">اتصال</a>
-            </div>
-        `).reverse().join('');
-    }
-</script>
+        // تشغيل Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // جلب البيانات من قاعدة البيانات
+        const workersRef = database.ref('workers');
+        workersRef.on('value', (snapshot) => {
+            const listDiv = document.getElementById('workers-list');
+            listDiv.innerHTML = ''; // مسح رسالة التحميل
+
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    listDiv.innerHTML += `
+                        <div class="card">
+                            <h3>${data.name}</h3>
+                            <p>المهنة: ${data.job}</p>
+                            <p>الهاتف: ${data.phone}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                listDiv.innerHTML = '<p>لا يوجد أسطوات مسجلين حالياً.</p>';
+            }
+        });
+    </script>
 </body>
 </html>
