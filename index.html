@@ -3,107 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل ديرتك - الفخامة والأمان</title>
+    <title>دليل ديرتك - النسخة الشاملة</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --primary: #002d5b; /* أزرق ملكي */
-            --gold: #d4af37; /* ذهبي مطفي */
-            --bg: #f8f9fa;
-            --glass: rgba(255, 255, 255, 0.9);
+            --primary: #002d5b;
+            --gold: #d4af37;
+            --secondary: #ff9800;
+            --success: #28a745;
+            --bg: #f4f7f9;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #333; }
-        .header { background: linear-gradient(135deg, var(--primary) 0%, #004a99 100%); color: white; padding: 40px 20px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .container { max-width: 600px; margin: auto; padding: 20px; }
-        .card { background: var(--glass); backdrop-filter: blur(10px); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.3); }
-        h2 { color: var(--primary); border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
-        input, select, textarea { width: 100%; padding: 14px; margin: 12px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; background: #fff; transition: 0.3s; }
-        input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .btn-reg { background: var(--primary); color: white; }
-        .btn-reg:hover { background: #003d7a; transform: translateY(-2px); }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #333; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, #004a99 100%); color: white; padding: 35px 20px; text-align: center; border-radius: 0 0 30px 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .container { max-width: 550px; margin: auto; padding: 15px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.05); }
+        h2 { color: var(--primary); font-size: 22px; margin-bottom: 15px; border-bottom: 2px solid var(--gold); display: inline-block; padding-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #dce1e7; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #fff; }
+        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 8px rgba(0,45,91,0.1); }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .btn-reg { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(0,45,91,0.2); }
         
         /* كرت الأسطى الفخم */
-        .worker-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 18px; border-right: 8px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: 0.3s; }
+        .worker-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 18px; border-right: 8px solid var(--primary); box-shadow: 0 6px 18px rgba(0,0,0,0.04); position: relative; }
         .stars { color: var(--gold); font-size: 20px; margin: 10px 0; }
-        .comment-box { background: #f0f2f5; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 14px; border-right: 3px solid var(--gold); }
+        .btn-call { display: block; background: var(--success); color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .btn-map { display: block; background: var(--secondary); color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 8px; }
+        .comment-section { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px solid #eee; }
         
-        /* لوحة الإدارة السرية */
-        .admin-trigger { position: fixed; bottom: 15px; left: 15px; width: 45px; height: 45px; background: rgba(0,0,0,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; z-index: 1000; }
-        #admin-panel { display: none; background: white; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; overflow-y: auto; padding: 30px; }
-        .stat-circle { width: 120px; height: 120px; border: 5px solid var(--gold); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px auto; color: var(--primary); }
-
+        /* لوحة الإدارة الراقية */
+        .admin-trigger { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; z-index: 999; box-shadow: 0 5px 20px rgba(0,0,0,0.3); border: 2px solid white; }
+        #admin-panel { display: none; background: white; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; overflow-y: auto; padding: 25px; box-sizing: border-box; }
+        .stat-box { background: var(--primary); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
+        
         #reg-section, #profile-section { display: none; }
     </style>
 </head>
 <body>
 
-<div class="admin-trigger" onclick="openAdmin()">ADM</div>
+<div class="admin-trigger" onclick="openAdminPanel()">إدارة</div>
 
 <div class="header">
-    <h1 style="margin:0; letter-spacing: 1px;">👷‍♂️ دليل ديرتك</h1>
-    <p id="status-bar" style="opacity: 0.9;">سحابة جوجل قيد التحقق...</p>
+    <h1 style="margin:0;">🇮🇶 دليل ديرتك</h1>
+    <p id="top-status">بياناتك محفوظة في سحابة جوجل ✅</p>
 </div>
 
 <div class="container">
     <div id="reg-section" class="card">
         <h2>تسجيل هوية جديدة ✨</h2>
-        <input type="text" id="name" placeholder="الأسم الكامل (مثلاً: ستار علي)">
-        <input type="tel" id="phone" placeholder="رقم الموبايل العراقي">
-        
+        <input type="text" id="name" placeholder="الأسم الكامل">
+        <input type="tel" id="phone" placeholder="رقم الموبايل">
         <select id="city">
             <option value="">اختر المحافظة</option>
-            <option>بغداد</option><option>ميسان</option><option>البصرة</option><option>ذي قار</option>
+            <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>ذي قار</option>
             <option>بابل</option><option>النجف</option><option>كربلاء</option><option>الأنبار</option>
             <option>نينوى</option><option>واسط</option><option>القادسية</option><option>المثنى</option>
             <option>ديالى</option><option>كركوك</option><option>صلاح الدين</option><option>أربيل</option>
             <option>سليمانية</option><option>دهوك</option>
         </select>
-
-        <select id="user-type" onchange="checkType()">
+        <select id="user-type" onchange="toggleFields()">
             <option value="">نوع الحساب</option>
-            <option value="driver">سائق (أبحث عن خدمة)</option>
             <option value="worker">أسطى (صاحب مهنة)</option>
+            <option value="driver">سائق (أبحث عن خدمة)</option>
         </select>
 
-        <div id="worker-fields" style="display:none;">
+        <div id="worker-only" style="display:none;">
             <select id="job">
                 <option value="">حدد مهنتك</option>
                 <option>فيتر</option><option>كهربائي سيارات</option><option>بنجرجي</option>
                 <option>تبديل زيوت</option><option>غسل سيارات</option><option>حداد سيارات</option>
                 <option>صباغ سيارات</option><option>مصلح تبريد</option>
             </select>
-            <input type="text" id="shop" placeholder="اسم المحل (اختياري)">
-            <input type="text" id="area" placeholder="المنطقة / الحي">
+            <input type="text" id="shop" placeholder="اسم المحل">
+            <input type="text" id="area" placeholder="المنطقة أو الحي">
         </div>
-
-        <button class="btn btn-reg" onclick="registerUser()">تثبيت الموقع وحفظ البيانات</button>
+        <button class="btn btn-reg" onclick="handleRegistration()">حفظ البيانات وتثبيت الموقع</button>
     </div>
 
     <div id="profile-section" class="card" style="text-align:center;">
-        <h2 id="user-welcome">أهلاً بك</h2>
-        <p>بياناتك محفوظة في سحابة جوجل ✅</p>
-        <button class="btn btn-reg" onclick="updateGPS()">تحديث موقع المحل الحالي</button>
-        <button onclick="logout()" style="background:none; border:none; color:#888; margin-top:20px; cursor:pointer;">تسجيل خروج</button>
+        <h2 id="welcome-msg">مرحباً بك</h2>
+        <p style="color: #666;">بياناتك وموقعك مثبتان في السحابة</p>
+        <button class="btn btn-reg" onclick="updateCurrentLocation()">تحديث موقع المحل (GPS)</button>
+        <button onclick="clearStorage()" style="background:none; border:none; color:red; margin-top:20px; cursor:pointer; font-weight:bold;">تسجيل خروج</button>
     </div>
 
-    <h2 style="text-align:center;">دليل النشامى المتوفرين</h2>
-    <div id="main-list"></div>
+    <h2 style="text-align:center; color: var(--primary);">دليل النشامى المتوفرين</h2>
+    <div id="list-display"></div>
 </div>
 
 <div id="admin-panel">
-    <button onclick="closeAdmin()" style="background:var(--primary); color:white; padding:10px; border-radius:10px; border:none;">🔙 رجوع</button>
-    <h2 style="text-align:center;">لوحة التحكم الملكية</h2>
-    <div class="stat-circle">
-        <h2 id="total-users" style="margin:0; border:none;">0</h2>
-        <small>مستخدم</small>
+    <button onclick="closeAdminPanel()" style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">🔙 إغلاق اللوحة</button>
+    <div class="stat-box">
+        <h1 id="count-num">0</h1>
+        <p>إجمالي المسجلين في التطبيق</p>
     </div>
-    <div id="admin-list"></div>
+    <div id="admin-list-data"></div>
 </div>
 
 <script>
-    // إعدادات السحابة
+    // إعدادات Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
         authDomain: "darji-app-13348.firebaseapp.com",
@@ -117,93 +115,119 @@
     const db = firebase.database();
 
     // رموز الدخول
-    const keys = { "satar1990": "full", "ahmed12345": "mod", "murtada54321": "mod", "ali98765": "mod", "jasim11223": "mod" };
-    let myRole = null;
+    const admins = {
+        "satar1990": "full",
+        "ahmed12345": "mod",
+        "murtada54321": "mod",
+        "ali98765": "mod",
+        "jasim11223": "mod"
+    };
+    let myCurrentRole = null;
 
     window.onload = () => {
-        const saved = localStorage.getItem('darji_user');
-        if (saved) {
-            const u = JSON.parse(saved);
+        const localData = localStorage.getItem('darji_v3_user');
+        if (localData) {
+            const user = JSON.parse(localData);
             document.getElementById('profile-section').style.display = 'block';
-            document.getElementById('user-welcome').innerText = "أهلاً " + u.name;
+            document.getElementById('welcome-msg').innerText = "أهلاً أسطى " + user.name;
         } else {
             document.getElementById('reg-section').style.display = 'block';
         }
-        syncData();
+        fetchCloudData();
     };
 
-    function checkType() {
-        const val = document.getElementById('user-type').value;
-        document.getElementById('worker-fields').style.display = (val === 'worker') ? 'block' : 'none';
+    function toggleFields() {
+        const type = document.getElementById('user-type').value;
+        document.getElementById('worker-only').style.display = (type === 'worker') ? 'block' : 'none';
     }
 
-    function registerUser() {
+    function handleRegistration() {
         const name = document.getElementById('name').value;
         const phone = document.getElementById('phone').value;
-        if (!name || !phone) return alert("أكمل الاسم والهاتف");
+        if(!name || !phone) return alert("أكمل البيانات المطلوبة");
 
         navigator.geolocation.getCurrentPosition((pos) => {
-            const uData = {
+            const newUser = {
                 name, phone,
                 city: document.getElementById('city').value,
                 type: document.getElementById('user-type').value,
                 job: document.getElementById('job').value || "سائق",
                 shop: document.getElementById('shop').value || "-",
                 area: document.getElementById('area').value || "-",
-                lat: pos.coords.latitude, lng: pos.coords.longitude,
-                rating: 5, comments: []
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+                stars: 5
             };
             const ref = db.ref('users').push();
-            ref.set(uData).then(() => {
-                uData.id = ref.key;
-                localStorage.setItem('darji_user', JSON.stringify(uData));
+            ref.set(newUser).then(() => {
+                newUser.id = ref.key;
+                localStorage.setItem('darji_v3_user', JSON.stringify(newUser));
                 location.reload();
             });
-        }, () => alert("افتح الـ GPS لحفظ موقعك"));
+        }, () => alert("يرجى تفعيل الـ GPS لحفظ موقعك"));
     }
 
-    function syncData() {
+    function fetchCloudData() {
         db.ref('users').on('value', (snap) => {
-            const list = document.getElementById('main-list');
-            const aList = document.getElementById('admin-list');
-            list.innerHTML = ''; aList.innerHTML = '';
-            let count = 0;
+            const mainDiv = document.getElementById('list-display');
+            const adminDiv = document.getElementById('admin-list-data');
+            mainDiv.innerHTML = ''; adminDiv.innerHTML = '';
+            let total = 0;
 
             snap.forEach((child) => {
-                const d = child.val(); count++;
+                const d = child.val();
+                total++;
                 if (d.type === 'worker') {
-                    list.innerHTML += `
+                    mainDiv.innerHTML += `
                         <div class="worker-card">
-                            <h3>أسطى ${d.name} (${d.job})</h3>
+                            <h3 style="margin:0; color:var(--primary);">الأسطى ${d.name} (${d.job})</h3>
                             <div class="stars">⭐⭐⭐⭐⭐ (5/5)</div>
-                            <p>📍 ${d.city} - ${d.area} | 🏪 ${d.shop}</p>
-                            <a href="tel:${d.phone}" style="display:block; background:#28a745; color:white; text-align:center; padding:12px; border-radius:10px; text-decoration:none; font-weight:bold;">📞 إتصال بالأسطى</a>
-                            <div class="comment-box"><b>آخر تقييم:</b> "شغل ممتاز وأنصح به"</div>
-                            <textarea placeholder="أضف تعليقك هنا..." style="height:60px;"></textarea>
-                            <button class="btn btn-reg" style="padding:5px; font-size:14px;">إرسال تقييم</button>
+                            <p style="margin:5px 0;">📍 ${d.city} - ${d.area} | 🏪 ${d.shop}</p>
+                            <a href="tel:${d.phone}" class="btn-call">📞 إتصل بالأسطى</a>
+                            <a href="https://www.google.com/maps?q=${d.lat},${d.lng}" target="_blank" class="btn-map">📍 فتح موقع المحل على الخريطة</a>
+                            <div class="comment-section">
+                                <b>آخر تقييم:</b> "شغل ممتاز جداً بارك الله بيك"
+                                <textarea placeholder="أضف تعليقك للسائقين الآخرين..." style="height:50px; margin-top:10px;"></textarea>
+                                <button class="btn btn-reg" style="padding:8px; font-size:14px; width:auto;">إرسال</button>
+                            </div>
                         </div>`;
                 }
-                aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;">
-                    <b>${d.name}</b> (${d.phone}) - ${d.city}
-                    ${myRole ? `<button onclick="del('${child.key}')" style="background:red; color:white; border:none; float:left;">حذف</button>` : ''}
-                </div>`;
+                adminDiv.innerHTML += `
+                    <div style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                        <span><b>${d.name}</b> (${d.job})<br><small>${d.phone}</small></span>
+                        ${myCurrentRole ? `<button onclick="removeUser('${child.key}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">حذف</button>` : ''}
+                    </div>`;
             });
-            document.getElementById('total-users').innerText = count;
+            document.getElementById('count-num').innerText = total;
         });
     }
 
-    function openAdmin() {
-        const p = prompt("رمز الإدارة:");
-        if (keys[p]) { myRole = keys[p]; document.getElementById('admin-panel').style.display = 'block'; }
+    function openAdminPanel() {
+        const p = prompt("أدخل رمز الإدارة السري:");
+        if (admins[p]) {
+            myCurrentRole = admins[p];
+            document.getElementById('admin-panel').style.display = 'block';
+        } else {
+            alert("الرمز غير صحيح!");
+        }
     }
-    function del(id) { if(confirm("حذف نهائي؟")) db.ref('users/' + id).remove(); }
-    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-    function logout() { localStorage.clear(); location.reload(); }
-    function updateGPS() {
-        const u = JSON.parse(localStorage.getItem('darji_user'));
+
+    function removeUser(id) {
+        if(confirm("هل تريد حذف هذا الحساب نهائياً؟")) {
+            db.ref('users/' + id).remove();
+        }
+    }
+
+    function closeAdminPanel() { document.getElementById('admin-panel').style.display = 'none'; }
+    function clearStorage() { localStorage.clear(); location.reload(); }
+    
+    function updateCurrentLocation() {
+        const local = JSON.parse(localStorage.getItem('darji_v3_user'));
         navigator.geolocation.getCurrentPosition((pos) => {
-            db.ref('users/' + u.id).update({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            alert("تم تحديث موقعك السحابي!");
+            db.ref('users/' + local.id).update({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            }).then(() => alert("تم تحديث موقعك السحابي بنجاح!"));
         });
     }
 </script>
