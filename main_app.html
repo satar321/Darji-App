@@ -1,62 +1,11 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - قائمة الأسطوات</title>
-    <style>
-        body { background: #f4f7f6; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-        .header { background: #002147; color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .container { padding: 15px; }
-        .card { 
-            background: white; 
-            padding: 15px; 
-            border-radius: 15px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border-right: 6px solid #b89344;
-        }
-        .info { flex-grow: 1; }
-        .info strong { display: block; color: #002147; font-size: 16px; margin-bottom: 3px; }
-        .info p { margin: 2px 0; color: #666; font-size: 13px; }
-        .map-link { color: #b89344; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; margin-top: 5px; }
-        .online-dot { 
-            width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; 
-            display: inline-block; margin-left: 8px; box-shadow: 0 0 5px #2ecc71;
-        }
-        .btn-call { 
-            background: #008080; color: white; padding: 10px 20px; border-radius: 10px; 
-            text-decoration: none; font-size: 14px; font-weight: bold; margin-right: 10px;
-        }
-        .no-data { text-align: center; color: #999; margin-top: 50px; }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <h3 style="margin: 0;">أسطوات ديرتك في ميسان والعراق</h3>
-</div>
-
-<div class="container" id="usersList">
-    </div>
-
 <script>
     window.onload = function() {
         const listDiv = document.getElementById('usersList');
         const allUsers = JSON.parse(localStorage.getItem('allUsers') || "[]");
-        
         const mechanics = allUsers.filter(u => u.role === 'mechanic');
 
-        if (mechanics.length === 0) {
-            listDiv.innerHTML = '<p class="no-data">لا يوجد أسطوات مسجلين حالياً</p>';
-            return;
-        }
-
         listDiv.innerHTML = mechanics.map(user => {
-            // تجهيز رابط الخريطة باستخدام الإحداثيات
+            // إصلاح الرابط ليعمل مباشرة مع خرائط جوجل
             const mapUrl = `https://www.google.com/maps?q=${user.lat},${user.lng}`;
             
             return `
@@ -72,6 +21,3 @@
         }).reverse().join('');
     }
 </script>
-
-</body>
-</html>
