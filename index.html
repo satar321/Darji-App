@@ -1,86 +1,28 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - الدخول</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body { margin: 0; padding: 0; background: #002147; font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-card { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-y: auto; max-height: 95vh; position: relative; }
-        .logo { width: 100px; margin-bottom: 15px; border-radius: 15px; }
-        .install-banner { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; cursor: pointer; display: none; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; box-sizing: border-box; }
-        .btn-entry { background: #b89344; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .hidden { display: none; }
-        #gpsStatus { font-size: 12px; margin: 10px 0; font-weight: bold; }
-        .admin-link { display: block; margin-top: 25px; color: #bbb; text-decoration: none; font-size: 11px; }
-    </style>
-</head>
-<body>
-
-<div class="login-card">
-    <div id="installBtn" class="install-banner">📥 اضغط هنا لتثبيت تطبيق "دارجي"</div>
-
-    <img src="logo.png" alt="دارجي" class="logo">
-    <h2 style="color: #002147;">تسجيل الدخول</h2>
-
-    <input type="text" id="userName" placeholder="الاسم الكامل">
-    <input type="tel" id="userPhone" placeholder="رقم الهاتف">
-    
-    <select id="userProvince">
-        <option value="">اختر المحافظة...</option>
-        <option>ميسان</option><option>بغداد</option><option>البصرة</option>
-        <option>ذي قار</option><option>النجف</option><option>كربلاء</option>
-        <option>بابل</option><option>الأنبار</option><option>نينوى</option>
-        <option>القادسية</option><option>المثنى</option><option>واسط</option>
-        <option>صلاح الدين</option><option>ديالى</option><option>كركوك</option>
-        <option>أربيل</option><option>السليمانية</option><option>دهوك</option>
-    </select>
-
-    <select id="userRole" onchange="toggleSpecialty()">
-        <option value="driver">أنا سائق</option>
-        <option value="mechanic">أنا أسطى</option>
-    </select>
-
-    <div id="mechanicOptions" class="hidden">
-        <select id="specialty">
-            <option value="">حدد مهنتك...</option>
-            <option>فيتر</option><option>بنجرجي</option><option>مواد احتياطية</option>
-            <option>محل زيوت</option><option>غسل سيارات</option>
-        </select>
-    </div>
-
-    <p id="gpsStatus" style="color: #e74c3c;">⚠️ يرجى تفعيل الموقع (GPS) للدخول</p>
-
-    <button class="btn-entry" onclick="saveAndGo()">دخول النظام</button>
-
-    <a href="admin.html" class="admin-link">⚙️ لوحة تحكم المشرفين</a>
-</div>
-
 <script>
     let userCoords = null;
 
-    // طلب الموقع فوراً
     window.onload = function() {
         if ("geolocation" in navigator) {
+            // إضافة خاصية الدقة العالية لضمان جلب الموقع بسرعة
             navigator.geolocation.getCurrentPosition(function(pos) {
                 userCoords = pos.coords;
-                document.getElementById('gpsStatus').innerText = "✅ الموقع مفعل بنجاح";
+                document.getElementById('gpsStatus').innerText = "✅ تم حفظ موقعك بدقة";
                 document.getElementById('gpsStatus').style.color = "#2ecc71";
-            });
+            }, function(err) {
+                alert("يرجى السماح بالوصول للموقع لتشغيل الخرائط");
+            }, { enableHighAccuracy: true });
         }
     };
-
-    function toggleSpecialty() {
-        const role = document.getElementById('userRole').value;
-        document.getElementById('mechanicOptions').classList.toggle('hidden', role !== 'mechanic');
-    }
 
     function saveAndGo() {
         const name = document.getElementById('userName').value;
         const province = document.getElementById('userProvince').value;
-        if(!name || !province || !userCoords) { alert("أكمل البيانات وفعل الـ GPS أولاً"); return; }
+        
+        // التحقق من وجود الموقع قبل الانتقال
+        if(!userCoords) {
+            alert("انتظر قليلاً حتى يتم تحديد موقعك (GPS)");
+            return;
+        }
 
         const data = {
             name: name,
@@ -88,27 +30,14 @@
             province: province,
             role: document.getElementById('userRole').value,
             specialty: document.getElementById('specialty').value || "سائق",
-            lat: userCoords.latitude,
-            lng: userCoords.longitude
+            lat: userCoords.latitude, // حفظ خط العرض
+            lng: userCoords.longitude // حفظ خط الطول
         };
 
-        // حفظ البيانات
         let allUsers = JSON.parse(localStorage.getItem('allUsers') || "[]");
         allUsers.push(data);
         localStorage.setItem('allUsers', JSON.stringify(allUsers));
         
         window.location.href = "main_app.html";
     }
-
-    // زر التحميل PWA
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); deferredPrompt = e;
-        document.getElementById('installBtn').style.display = 'block';
-    });
-    document.getElementById('installBtn').onclick = () => {
-        if(deferredPrompt) deferredPrompt.prompt();
-    };
 </script>
-</body>
-</html>
