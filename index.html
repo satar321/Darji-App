@@ -3,26 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - الدخول</title>
+    <title>دارجي - دخول</title>
     <link rel="manifest" href="manifest.json">
     <style>
         body { margin: 0; background: #002147; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .login-card { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .logo { width: 110px; margin-bottom: 15px; border-radius: 15px; }
-        .btn-install { background: #008080; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-size: 14px; margin-bottom: 15px; display: none; cursor: pointer; font-weight: bold; }
+        .logo { width: 100px; margin-bottom: 15px; border-radius: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; box-sizing: border-box; }
-        .btn-entry { background: #b89344; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .admin-link { display: block; margin-top: 25px; color: #bbb; text-decoration: none; font-size: 11px; }
+        .btn-entry { background: #b89344; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; }
         .hidden { display: none; }
-        #gpsStatus { font-size: 12px; margin: 5px 0; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
     <img src="logo.png" alt="دارجي" class="logo">
-    <button id="installBtn" class="btn-install">📥 تثبيت تطبيق دارجي على هاتفك</button>
-    <h2 style="color: #002147; margin: 0 0 15px 0;">تسجيل دخول</h2>
+    <h2 style="color: #002147; margin-bottom: 15px;">دخول النظام</h2>
 
     <input type="text" id="userName" placeholder="الاسم الكامل">
     <input type="tel" id="userPhone" placeholder="رقم الهاتف">
@@ -31,74 +27,57 @@
         <option value="">اختر المحافظة...</option>
         <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>ذي قار</option>
         <option>النجف</option><option>كربلاء</option><option>بابل</option><option>الأنبار</option>
-        <option>نينوى</option><option>واسط</option><option>صلاح الدين</option><option>ديالى</option>
+        <option>نينوى</option><option>القادسية</option><option>المثنى</option><option>واسط</option>
     </select>
 
-    <select id="userRole" onchange="toggleFields()">
-        <option value="driver">أنا سائق (أبحث عن مساعدة)</option>
-        <option value="mechanic">أنا أسطى (صاحب مهنة)</option>
+    <select id="userRole" onchange="toggleMech()">
+        <option value="driver">أنا سائق</option>
+        <option value="mechanic">أنا أسطى</option>
     </select>
 
     <div id="mechFields" class="hidden">
         <input type="text" id="shopName" placeholder="اسم المحل (مثل: محلات الأخوين)">
         <input type="text" id="shopAddress" placeholder="عنوان المحل الدقيق">
         <select id="specialty">
-            <option value="فيتر">فيتر</option>
-            <option value="بنجرجي">بنجرجي</option>
-            <option value="كهربائي">كهربائي</option>
-            <option value="مواد احتياطية">مواد احتياطية</option>
+            <option>فيتر</option><option>بنجرجي</option><option>كهربائي</option><option>مواد احتياطية</option>
         </select>
-        <p id="gpsStatus" style="color: #e74c3c;">📍 بانتظار GPS لتثبيت موقع المحل...</p>
+        <p id="gpsStatus" style="color:red; font-size:11px;">📍 بانتظار GPS لتثبيت موقع المحل...</p>
     </div>
 
     <button class="btn-entry" onclick="processLogin()">دخول النظام</button>
-    <a href="admin.html" class="admin-link">⚙️ لوحة تحكم المشرفين</a>
+    <a href="admin.html" style="display:block; margin-top:20px; color:#bbb; text-decoration:none; font-size:11px;">⚙️ لوحة التحكم</a>
 </div>
 
 <script>
-    let lat, lng, deferredPrompt;
+    let userLat = 0, userLng = 0;
 
-    // معالج زر التحميل
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault(); deferredPrompt = e;
-        document.getElementById('installBtn').style.display = 'block';
-    });
-
-    document.getElementById('installBtn').onclick = () => {
-        if(deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
-    };
-
-    // جلب موقع GPS للمحل
     navigator.geolocation.getCurrentPosition(p => {
-        lat = p.coords.latitude; lng = p.coords.longitude;
-        document.getElementById('gpsStatus').innerText = "✅ تم التقاط موقع المحل بنجاح";
+        userLat = p.coords.latitude; userLng = p.coords.longitude;
+        document.getElementById('gpsStatus').innerText = "✅ تم التقاط موقع المحل";
         document.getElementById('gpsStatus').style.color = "green";
     }, null, {enableHighAccuracy: true});
 
-    function toggleFields() {
-        const isMech = document.getElementById('userRole').value === 'mechanic';
-        document.getElementById('mechFields').classList.toggle('hidden', !isMech);
+    function toggleMech() {
+        document.getElementById('mechFields').classList.toggle('hidden', document.getElementById('userRole').value !== 'mechanic');
     }
 
     function processLogin() {
-        const name = document.getElementById('userName').value;
         const role = document.getElementById('userRole').value;
-        if(!name) { alert("يرجى كتابة الاسم"); return; }
-        if(role === 'mechanic' && !lat) { alert("انتظر GPS لتثبيت موقع المحل"); return; }
+        if(role === 'mechanic' && userLat === 0) { alert("يرجى الانتظار لتحديد الموقع"); return; }
 
-        const userData = {
-            name: name,
+        const data = {
+            name: document.getElementById('userName').value,
             phone: document.getElementById('userPhone').value,
             province: document.getElementById('userProvince').value,
             role: role,
             shop: document.getElementById('shopName').value || "محل شخصي",
             address: document.getElementById('shopAddress').value || "غير محدد",
             spec: document.getElementById('specialty').value,
-            lat: lat, lng: lng
+            lat: userLat, lng: userLng
         };
 
         let users = JSON.parse(localStorage.getItem('users') || "[]");
-        users.push(userData);
+        users.push(data);
         localStorage.setItem('users', JSON.stringify(users));
         window.location.href = "main_app.html";
     }
