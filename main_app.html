@@ -19,62 +19,10 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             border-right: 6px solid #b89344;
         }
-        .info strong { display: block; color: #002147; font-size: 16px; }
-        .info p { margin: 5px 0; color: #666; font-size: 13px; }
+        .info { flex-grow: 1; }
+        .info strong { display: block; color: #002147; font-size: 16px; margin-bottom: 3px; }
+        .info p { margin: 2px 0; color: #666; font-size: 13px; }
+        .map-link { color: #b89344; text-decoration: none; font-size: 12px; font-weight: bold; display: flex; align-items: center; margin-top: 5px; }
         .online-dot { 
-            width: 10px; 
-            height: 10px; 
-            background: #2ecc71; 
-            border-radius: 50%; 
-            display: inline-block; 
-            margin-left: 8px; 
-            box-shadow: 0 0 5px #2ecc71;
-        }
-        .btn-call { 
-            background: #008080; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 10px; 
-            text-decoration: none; 
-            font-size: 14px; 
-            font-weight: bold;
-        }
-        .no-data { text-align: center; color: #999; margin-top: 50px; }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <h3 style="margin: 0;">أسطوات ديرتك في ميسان والعراق</h3>
-</div>
-
-<div class="container" id="usersList">
-    </div>
-
-<script>
-    window.onload = function() {
-        const listDiv = document.getElementById('usersList');
-        const allUsers = JSON.parse(localStorage.getItem('allUsers') || "[]");
-        
-        if (allUsers.length === 0) {
-            listDiv.innerHTML = '<p class="no-data">لا يوجد أسطوات مسجلين حالياً</p>';
-            return;
-        }
-
-        // عرض الأسطوات فقط في القائمة (وتجاهل السائقين)
-        const mechanics = allUsers.filter(u => u.role === 'mechanic');
-
-        listDiv.innerHTML = mechanics.map(user => `
-            <div class="card">
-                <div class="info">
-                    <strong><span class="online-dot"></span>الأسطى ${user.name} (${user.specialty})</strong>
-                    <p>📍 محافظة ${user.province}</p>
-                </div>
-                <a href="tel:${user.phone}" class="btn-call">اتصال</a>
-            </div>
-        `).reverse().join(''); // جعل الأحدث يظهر في الأعلى
-    }
-</script>
-
-</body>
-</html>
+            width: 10px; height: 10px; background: #2ecc71; border-radius: 50%; 
+            display: inline-block; margin-left: 8px; box-shadow: 0 0 5px #2ecc7
