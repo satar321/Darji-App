@@ -7,27 +7,28 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; padding: 20px; text-align: center; }
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; text-align: center; }
         .form-container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        h2 { color: #002d5b; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
-        button { width: 95%; padding: 12px; background-color: #002d5b; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
-        #status { margin-top: 15px; font-weight: bold; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        button { width: 95%; padding: 12px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-save { background-color: #002d5b; }
+        .btn-gps { background-color: #ff9800; }
     </style>
 </head>
 <body>
 
     <div class="form-container">
-        <h2>إضافة أسطى جديد 🛠️</h2>
-        <input type="text" id="name" placeholder="اسم الأسطى (مثلاً: أبو علي)">
-        <input type="text" id="job" placeholder="المهنة (مثلاً: صباغ، ميكانيكي)">
+        <h2>تسجيل أسطى جديد 🛠️</h2>
+        <input type="text" id="name" placeholder="اسم الأسطى">
+        <input type="text" id="job" placeholder="المهنة">
         <input type="text" id="phone" placeholder="رقم الموبايل">
-        <button onclick="saveWorker()">حفظ في الدليل</button>
+        <button class="btn-gps" onclick="getLocation()">📍 تحديد موقعي الحالي</button>
+        <p id="loc-text" style="color: gray; font-size: 12px;">الموقع غير محدد</p>
+        <button class="btn-save" onclick="saveWorker()">حفظ البيانات</button>
         <p id="status"></p>
     </div>
 
     <script>
-        // كودك الخارق للربط
         const firebaseConfig = {
             apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
             authDomain: "darji-app-13348.firebaseapp.com",
@@ -41,34 +42,33 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        let lat = "31.83", lng = "47.14"; // إحداثيات افتراضية للعمارة
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    lat = pos.coords.latitude;
+                    lng = pos.coords.longitude;
+                    document.getElementById('loc-text').innerText = "✅ تم تحديد موقعك";
+                });
+            }
+        }
 
         function saveWorker() {
             const name = document.getElementById('name').value;
             const job = document.getElementById('job').value;
             const phone = document.getElementById('phone').value;
-            const status = document.getElementById('status');
-
+            
             if(name && job && phone) {
-                status.innerText = "جاري الحفظ...";
-                const newWorkerRef = database.ref('workers').push();
-                newWorkerRef.set({
+                database.ref('workers').push().set({
                     name: name,
                     job: job,
                     phone: phone,
-                    timestamp: Date.now()
+                    lat: lat,
+                    lng: lng
                 }).then(() => {
-                    status.style.color = "green";
-                    status.innerText = "✅ تم الحفظ بنجاح!";
-                    document.getElementById('name').value = '';
-                    document.getElementById('job').value = '';
-                    document.getElementById('phone').value = '';
-                }).catch((error) => {
-                    status.style.color = "red";
-                    status.innerText = "❌ فشل الحفظ: " + error.message;
+                    document.getElementById('status').innerText = "✅ تم الحفظ بنجاح!";
                 });
-            } else {
-                status.style.color = "orange";
-                status.innerText = "⚠️ يرجى ملء جميع الحقول!";
             }
         }
     </script>
