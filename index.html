@@ -3,133 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دارجي - تسجيل الدخول</title>
-    <meta name="description" content="تطبيق دارجي - دليل أسطوات ميسان والعراق">
-    <meta name="keywords" content="دارجي, فيتر, كهربائي, أسطى, ميسان, تصليح سيارات">
-    <meta name="author" content="ستار">
-    <link rel="manifest" href="manifest.json">
+    <title>دليل أسطوات ديرتك</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
-        body { margin: 0; background: #002147; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
-        .login-card { background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
-        .logo { width: 120px; margin-bottom: 20px; border-radius: 20px; }
-        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: #b89344; }
-        .btn-entry { background: #b89344; color: white; border: none; padding: 16px; width: 100%; border-radius: 12px; font-size: 18px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        .btn-entry:active { transform: scale(0.98); }
-        .hidden { display: none; }
-        .admin-section { margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px; }
-        .admin-link { color: #888; text-decoration: none; font-size: 13px; font-weight: bold; transition: 0.3s; }
-        .admin-link:hover { color: #b89344; }
-        #gpsStatus { font-size: 12px; margin: 5px 0; font-weight: bold; }
+        body { font-family: sans-serif; background: #f0f2f5; padding: 10px; }
+        .reg-box { background: #002d5b; color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; }
+        .input-style { width: 90%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; }
+        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 12px; border-right: 5px solid #002d5b; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-call { display: block; background: #28a745; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; margin-top: 10px; }
+        .btn-map { display: block; background: #ff9800; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <img src="logo.png" alt="دارجي" class="logo">
-    <h2 style="color: #002147; margin: 0 0 20px 0;">تسجيل الدخول</h2>
-
-    <input type="text" id="userName" placeholder="الاسم الكامل (مطلوب)">
-    <input type="tel" id="userPhone" placeholder="رقم الهاتف (مطلوب)">
-    
-    <select id="userProvince">
-        <option value="">اختر المحافظة (مطلوب)...</option>
-        <option>ميسان</option><option>بغداد</option><option>البصرة</option>
-        <option>ذي قار</option><option>النجف</option><option>كربلاء</option>
-        <option>بابل</option><option>الأنبار</option><option>نينوى</option>
-        <option>واسط</option><option>صلاح الدين</option><option>ديالى</option>
-    </select>
-
-    <select id="userRole" onchange="toggleMech()">
-        <option value="">حدد نوع الحساب (مطلوب)...</option>
-        <option value="driver">أنا سائق</option>
-        <option value="mechanic">أنا أسطى</option>
-    </select>
-
-    <div id="mechFields" class="hidden">
-        <input type="text" id="shopName" placeholder="اسم المحل (مثل: محلات ستار)">
-        <input type="text" id="shopAddress" placeholder="عنوان المحل (مثل: حي الحسين)">
-        <select id="specialty">
-            <option>فيتر</option><option>بنجرجي</option>
-            <option>كهربائي</option><option>مواد احتياطية</option>
-        </select>
-        <p id="gpsStatus" style="color:red;">📍 بانتظار GPS لتحديد موقعك...</p>
+    <div class="reg-box">
+        <h2>سجل كأُسطى جديد 👷‍♂️</h2>
+        <input type="text" id="name" class="input-style" placeholder="اسمك الكامل">
+        <input type="text" id="job" class="input-style" placeholder="مهنتك">
+        <input type="text" id="phone" class="input-style" placeholder="رقم الموبايل">
+        <button onclick="autoRegister()" style="width: 95%; padding: 15px; background: #ff9800; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">تسجيل وحفظ بياناتي</button>
+        <p id="status" style="font-size: 13px; margin-top: 10px;"></p>
     </div>
 
-    <button class="btn-entry" onclick="processLogin()">دخول النظام</button>
+    <hr>
+    <h3 style="text-align: center; color: #002d5b;">دليل الأسطوات المسجلين</h3>
+    <div id="workers-list"></div>
 
-    <div class="admin-section">
-        <a href="admin.html" class="admin-link">⚙️ لوحة تحكم المشرفين</a>
-    </div>
-</div>
-
-<script>
-    // المتغيرات الأساسية
-    let userLat = 0;
-    let userLng = 0;
-    let installer;
-
-    // --- كود تفعيل زر تثبيت التطبيق ---
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        installer = e;
-    });
-
-    function checkInstall() {
-        if (installer) {
-            installer.prompt();
-        } else {
-            alert("التطبيق جاهز للتثبيت! يمكنك أيضاً الضغط على (الثلاث نقاط) في المتصفح واختيار 'تثبيت التطبيق'.");
-        }
-    }
-    // --------------------------------
-
-    // تشغيل الـ GPS
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(p => {
-            userLat = p.coords.latitude;
-            userLng = p.coords.longitude;
-            const status = document.getElementById('gpsStatus');
-            if(status) {
-                status.innerText = "✅ تم تحديد موقع المحل بنجاح";
-                status.style.color = "green";
-            }
-        }, err => {
-            console.log("GPS Error: ", err);
-        }, {enableHighAccuracy: true});
-    }
-
-    function toggleMech() {
-        const role = document.getElementById('userRole').value;
-        const fields = document.getElementById('mechFields');
-        if(role === 'mechanic') {
-            fields.classList.remove('hidden');
-        } else {
-            fields.classList.add('hidden');
-        }
-    }
-
-    function processLogin() {
-        const name = document.getElementById('userName').value.trim();
-        const role = document.getElementById('userRole').value;
-
-        if (!name || !role) {
-            alert("يا ستار، يرجى ملء الحقول المطلوبة!");
-            return;
-        }
-
-        const userData = {
-            name: name,
-            phone: document.getElementById('userPhone').value,
-            role: role,
-            lat: userLat,
-            lng: userLng
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDING7DzLK9YwWtdBt1CLJhFPOqRrCBo8s",
+            authDomain: "darji-app-13348.firebaseapp.com",
+            databaseURL: "https://darji-app-13348-default-rtdb.firebaseio.com",
+            projectId: "darji-app-13348",
+            storageBucket: "darji-app-13348.firebasestorage.app",
+            messagingSenderId: "553323569740",
+            appId: "1:553323569740:web:57075700fe68af3d010ae9"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        window.location.href = "main_app.html";
-    }
-</script>
+        // وظيفة التسجيل التلقائي مع الموقع
+        function autoRegister() {
+            const name = document.getElementById('name').value;
+            const job = document.getElementById('job').value;
+            const phone = document.getElementById('phone').value;
+            const status = document.getElementById('status');
 
+            if(name && job && phone) {
+                status.innerText = "⏳ جاري حفظ موقعك والبيانات...";
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    db.ref('workers').push().set({
+                        name, job, phone, 
+                        lat: pos.coords.latitude, 
+                        lng: pos.coords.longitude
+                    }).then(() => { status.innerText = "✅ تم التسجيل بنجاح!"; });
+                }, () => {
+                    db.ref('workers').push().set({ name, job, phone, lat: "31.83", lng: "47.14" })
+                    .then(() => { status.innerText = "✅ تم التسجيل (بموقع افتراضي)"; });
+                });
+            }
+        }
+
+        // وظيفة عرض البيانات فوراً (تحديث تلقائي)
+        db.ref('workers').on('value', (snapshot) => {
+            const listDiv = document.getElementById('workers-list');
+            listDiv.innerHTML = '';
+            snapshot.forEach((child) => {
+                const d = child.val();
+                listDiv.innerHTML += `
+                    <div class="card">
+                        <h3>الأسطى: ${d.name}</h3>
+                        <p>🔧 المهنة: ${d.job}</p>
+                        <a href="tel:${d.phone}" class="btn-call">📞 إتصل بالأسطى</a>
+                        <a href="https://www.google.com/maps?q=${d.lat},${d.lng}" target="_blank" class="btn-map">📍 موقع الأسطى على الخريطة</a>
+                    </div>
+                `;
+            });
+        });
+    </script>
 </body>
 </html>
+
