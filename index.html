@@ -7,76 +7,118 @@
     <link rel="manifest" href="manifest.json">
     <style>
         body { margin: 0; padding: 0; background: #002147; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-card { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-card { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow-y: auto; max-height: 95vh; }
         .logo { width: 120px; margin-bottom: 15px; border-radius: 15px; }
-        .install-banner { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; cursor: pointer; display: none; font-weight: bold; }
+        .install-banner { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 13px; cursor: pointer; display: none; font-weight: bold; border: 1px solid #2e7d32; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; box-sizing: border-box; }
-        .btn-entry { background: #b89344; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-entry { background: #b89344; color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .btn-entry:hover { background: #967835; }
+        .admin-link { display: block; margin-top: 20px; color: #bbb; text-decoration: none; font-size: 11px; }
         .hidden { display: none; }
         #gpsStatus { font-size: 12px; margin: 10px 0; font-weight: bold; }
     </style>
 </head>
 <body>
+
 <div class="login-card">
-    <div id="installBtn" class="install-banner">📥 تثبيت تطبيق دارجي على هاتفك</div>
-    <img src="logo.png" class="logo">
-    <h2 style="color: #002147;">تسجيل الدخول</h2>
+    <div id="installBtn" class="install-banner">📥 اضغط هنا لتثبيت "دارجي" على هاتفك</div>
+
+    <img src="logo.png" alt="دارجي" class="logo">
+    <h2 style="color: #002147; margin: 0;">تسجيل الدخول</h2>
+
     <input type="text" id="userName" placeholder="الاسم الكامل">
-    <input type="tel" id="userPhone" placeholder="رقم الهاتف">
+    <input type="tel" id="userPhone" placeholder="رقم الهاتف (واتساب)">
+    
     <select id="userProvince">
         <option value="">اختر المحافظة...</option>
         <option>ميسان</option><option>بغداد</option><option>البصرة</option><option>ذي قار</option>
-        <option>النجف</option><option>كربلاء</option><option>بابل</option><option>واسط</option>
-        <option>الأنبار</option><option>نينوى</option><option>صلاح الدين</option><option>ديالى</option>
-        <option>كركوك</option><option>أربيل</option><option>السليمانية</option><option>دهوك</option>
-        <option>المثنى</option><option>القادسية</option>
+        <option>النجف</option><option>كربلاء</option><option>بابل</option><option>الأنبار</option>
+        <option>نينوى</option><option>القادسية</option><option>المثنى</option><option>واسط</option>
+        <option>صلاح الدين</option><option>ديالى</option><option>كركوك</option><option>أربيل</option>
+        <option>السليمانية</option><option>دهوك</option>
     </select>
-    <select id="userRole" onchange="toggleSpecialty()">
-        <option value="driver">أنا سائق</option>
-        <option value="mechanic">أنا أسطى</option>
+
+    <select id="userRole" onchange="toggleMechanicOptions(this.value)">
+        <option value="driver">أنا سائق (أبحث عن مساعدة)</option>
+        <option value="mechanic">أنا أسطى (صاحب مهنة)</option>
     </select>
+
     <div id="mechanicOptions" class="hidden">
         <select id="specialty">
-            <option value="">حدد المهنة...</option>
-            <option>فيتر</option><option>بنجرجي</option><option>مواد احتياطية</option>
-            <option>محل زيوت</option><option>غسل سيارات</option>
+            <option value="فيتر">فيتر (ميكانيكي)</option>
+            <option value="بنجرجي">بنجرجي / إطارات</option>
+            <option value="مواد احتياطية">محل مواد احتياطية</option>
+            <option value="كهربائي">كهربائي سيارات</option>
+            <option value="غسل وتشحيم">غسل وتشحيم</option>
         </select>
     </div>
-    <p id="gpsStatus" style="color: #e74c3c;">⚠️ يرجى تفعيل الموقع (GPS)</p>
-    <button class="btn-entry" onclick="saveAndGo()">دخول النظام</button>
+
+    <p id="gpsStatus" style="color: #e74c3c;">⚠️ يرجى تفعيل الموقع (GPS) للمتابعة</p>
+    
+    <button class="btn-entry" onclick="processLogin()">دخول النظام</button>
+    
+    <a href="admin.html" class="admin-link">⚙️ لوحة تحكم المشرفين</a>
 </div>
 
 <script>
-    let userCoords = null;
-    navigator.geolocation.getCurrentPosition(p => {
-        userCoords = p.coords;
-        document.getElementById('gpsStatus').innerText = "✅ تم تحديد الموقع";
-        document.getElementById('gpsStatus').style.color = "#2ecc71";
-    }, null, {enableHighAccuracy: true});
+    let lat, lng;
 
-    function toggleSpecialty() {
-        document.getElementById('mechanicOptions').classList.toggle('hidden', document.getElementById('userRole').value !== 'mechanic');
+    // تشغيل الجي بي اس
+    window.onload = function() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(p => {
+                lat = p.coords.latitude; 
+                lng = p.coords.longitude;
+                document.getElementById('gpsStatus').innerText = "✅ تم تحديد موقعك بنجاح";
+                document.getElementById('gpsStatus').style.color = "green";
+            }, (err) => {
+                alert("يرجى تفعيل GPS لتتمكن من استخدام الخرائط");
+            }, {enableHighAccuracy: true});
+        }
+    };
+
+    function toggleMechanicOptions(role) {
+        document.getElementById('mechanicOptions').style.display = (role === 'mechanic' ? 'block' : 'none');
     }
 
-    function saveAndGo() {
+    function processLogin() {
         const name = document.getElementById('userName').value;
         const province = document.getElementById('userProvince').value;
-        if(!name || !province || !userCoords) { alert("أكمل البيانات وفعل الـ GPS"); return; }
+        
+        if(!name || !province) { alert("يرجى إكمال الاسم والمحافظة"); return; }
+        if(!lat) { alert("انتظر حتى يتم التقاط إحداثيات الموقع (GPS)"); return; }
+
         const data = {
-            name: name, phone: document.getElementById('userPhone').value,
-            province: province, role: document.getElementById('userRole').value,
-            specialty: document.getElementById('specialty').value || "سائق",
-            lat: userCoords.latitude, lng: userCoords.longitude
+            name: name,
+            phone: document.getElementById('userPhone').value,
+            province: province,
+            role: document.getElementById('userRole').value,
+            spec: document.getElementById('specialty').value,
+            lat: lat, lng: lng
         };
-        let allUsers = JSON.parse(localStorage.getItem('allUsers') || "[]");
-        allUsers.push(data);
-        localStorage.setItem('allUsers', JSON.stringify(allUsers));
+
+        let users = JSON.parse(localStorage.getItem('users') || "[]");
+        users.push(data);
+        localStorage.setItem('users', JSON.stringify(users));
+        
         window.location.href = "main_app.html";
     }
 
+    // برمجة زر التحميل PWA
     let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').style.display = 'block'; });
-    document.getElementById('installBtn').onclick = () => { if(deferredPrompt) deferredPrompt.prompt(); };
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installBtn').style.display = 'block';
+    });
+
+    document.getElementById('installBtn').onclick = () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt = null;
+            document.getElementById('installBtn').style.display = 'none';
+        }
+    };
 </script>
 </body>
 </html>
