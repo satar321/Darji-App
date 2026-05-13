@@ -3,37 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل ديرتك - نسخة العراق الشاملة</title>
+    <title>دليل ديرتك - نسخة احترافية</title>
     
-    <!-- الخرائط -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- فيربيس -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <style>
         :root { --primary: #002d5b; --gold: #ffd700; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); margin: 0; padding: 0; overflow-x: hidden; }
         .header { background: linear-gradient(135deg, var(--primary) 0%, #004a99 100%); color: white; padding: 30px 20px; text-align: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
         .container { max-width: 550px; margin: -20px auto 0; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
         
-        #map { height: 200px; width: 100%; border-radius: 15px; margin: 10px 0; border: 2px solid var(--primary); }
+        #map { height: 200px; width: 100%; border-radius: 15px; margin: 10px 0; border: 2px solid var(--primary); z-index: 1; }
         
         .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: block; text-decoration: none; text-align: center; margin-top: 10px; }
         .btn-main { background: var(--primary); color: white; }
         .btn-call { background: #28a745; color: white; }
         
-        .stars-container { color: var(--gold); font-size: 20px; cursor: pointer; margin: 5px 0; background: #fffde7; padding: 5px; border-radius: 8px; display: inline-block; }
-        .worker-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 15px; border-right: 8px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .worker-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 15px; border-right: 8px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; }
+        .rating-star-btn { background: #fffde7; border: 1px solid var(--gold); color: #856404; padding: 5px 10px; border-radius: 8px; font-size: 14px; cursor: pointer; display: inline-block; margin: 5px 0; }
 
-        .admin-trigger { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 2px solid white; font-size: 11px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        #admin-panel { display: none; background: white; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+        /* نافذة التقييم والإدارة المخفية (بدون روابط) */
+        .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 85%; max-width: 400px; text-align: center; }
+        
+        .admin-trigger { position: fixed; bottom: 20px; left: 20px; width: 55px; height: 55px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 2px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 11px; font-weight: bold; }
+        
+        #admin-panel { display: none; background: white; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .stat-box { background: #eef2f7; padding: 15px; border-radius: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
-        .stat-item { background: white; padding: 8px; border-radius: 10px; border: 1px solid #ddd; }
         .stat-num { display: block; font-size: 18px; font-weight: bold; color: var(--primary); }
 
         #reg-section, #profile-section { display: none; }
@@ -41,11 +42,38 @@
 </head>
 <body>
 
-<div class="admin-trigger" onclick="openAdmin()">إدارة</div>
+<div class="admin-trigger" onclick="showAdminPrompt()">إدارة</div>
+
+<!-- نافذة التقييم المخصصة (بديل الـ prompt) -->
+<div id="rateModal" class="custom-modal">
+    <div class="modal-content">
+        <h3>قيم النشمي ⭐</h3>
+        <p>كم نجمة يستحق هذا الأسطى؟</p>
+        <select id="starSelect">
+            <option value="5">⭐⭐⭐⭐⭐ ممتاز</option>
+            <option value="4">⭐⭐⭐⭐ جيد جداً</option>
+            <option value="3">⭐⭐⭐ جيد</option>
+            <option value="2">⭐⭐ مقبول</option>
+            <option value="1">⭐ ضعيف</option>
+        </select>
+        <button class="btn btn-main" onclick="submitRate()">إرسال التقييم</button>
+        <button class="btn" style="background:#eee;" onclick="closeModal('rateModal')">إلغاء</button>
+    </div>
+</div>
+
+<!-- نافذة دخول الإدارة المخصصة (بديل الـ prompt) -->
+<div id="adminPromptModal" class="custom-modal">
+    <div class="modal-content">
+        <h3>دخول الإدارة 🔐</h3>
+        <input type="password" id="adminPassInput" placeholder="أدخل رمز الدخول">
+        <button class="btn btn-main" onclick="checkAdminPass()">دخول</button>
+        <button class="btn" style="background:#eee;" onclick="closeModal('adminPromptModal')">إلغاء</button>
+    </div>
+</div>
 
 <div class="header">
     <h1>🇮🇶 دليل ديرتك</h1>
-    <p>أهلاً بك في الدليل الشامل لكل المحافظات</p>
+    <p>دليلك الأول في كل محافظات العراق</p>
 </div>
 
 <div class="container">
@@ -53,43 +81,17 @@
         <h2 style="text-align:center;">تسجيل الهوية ✨</h2>
         <input type="text" id="reg-name" placeholder="الأسم الكامل">
         <input type="tel" id="reg-phone" placeholder="رقم الموبايل">
-        
         <select id="reg-province">
             <option value="">اختر المحافظة...</option>
-            <option value="بغداد">بغداد</option>
-            <option value="ميسان">ميسان</option>
-            <option value="البصرة">البصرة</option>
-            <option value="ذي قار">ذي قار</option>
-            <option value="النجف">النجف</option>
-            <option value="كربلاء">كربلاء</option>
-            <option value="بابل">بابل</option>
-            <option value="الأنبار">الأنبار</option>
-            <option value="نينوى">نينوى</option>
-            <option value="القادسية">القادسية</option>
-            <option value="المثنى">المثنى</option>
-            <option value="واسط">واسط</option>
-            <option value="صلاح الدين">صلاح الدين</option>
-            <option value="ديالى">ديالى</option>
-            <option value="كركوك">كركوك</option>
-            <option value="أربيل">أربيل</option>
-            <option value="السليمانية">السليمانية</option>
-            <option value="دهوك">دهوك</option>
+            <option value="بغداد">بغداد</option><option value="ميسان">ميسان</option><option value="البصرة">البصرة</option><option value="ذي قار">ذي قار</option><option value="النجف">النجف</option><option value="كربلاء">كربلاء</option><option value="بابل">بابل</option><option value="الأنبار">الأنبار</option><option value="نينوى">نينوى</option><option value="القادسية">القادسية</option><option value="المثنى">المثنى</option><option value="واسط">واسط</option><option value="صلاح الدين">صلاح الدين</option><option value="ديالى">ديالى</option><option value="كركوك">كركوك</option><option value="أربيل">أربيل</option><option value="السليمانية">السليمانية</option><option value="دهوك">دهوك</option>
         </select>
-
         <select id="reg-type" onchange="toggleFields()">
-            <option value="driver">سائق (أبحث عن أسطى)</option>
-            <option value="worker">أسطى (صاحب مهنة)</option>
+            <option value="driver">سائق</option>
+            <option value="worker">أسطى</option>
         </select>
-
-        <div id="worker-extra" style="display:none;">
-            <input type="text" id="reg-job" placeholder="المهنة (فيتر، كهربائي...)">
-            <input type="text" id="reg-area" placeholder="المنطقة أو الحي">
-        </div>
-
-        <p style="text-align:center; font-size:12px; color: #666;">📍 حدد مكانك بدقة على الخريطة:</p>
+        <div id="worker-extra" style="display:none;"><input type="text" id="reg-job" placeholder="المهنة"><input type="text" id="reg-area" placeholder="المنطقة أو الحي"></div>
         <div id="map"></div>
         <input type="hidden" id="lat"><input type="hidden" id="lng">
-
         <button class="btn btn-main" onclick="register()">حفظ البيانات ✅</button>
     </div>
 
@@ -99,13 +101,13 @@
         <button onclick="logout()" style="color:red; background:none; border:none; margin-top:15px; cursor:pointer;">تسجيل خروج</button>
     </div>
 
-    <h2 style="text-align:center; color: var(--primary);">🛠️ المهن والخدمات القريبة</h2>
+    <h2 style="text-align:center; color: var(--primary);">🛠️ المهن والخدمات</h2>
     <div id="display-list"></div>
 </div>
 
 <div id="admin-panel">
-    <button onclick="closeAdmin()" style="padding:10px; border-radius:8px; border:none; background:#eee; cursor:pointer;">🔙 عودة</button>
-    <h2 style="text-align:center;">لوحة تحكم المشرفين</h2>
+    <button onclick="closeAdmin()" style="padding:10px; border-radius:8px; border:none; background:#eee;">🔙 عودة</button>
+    <h2 style="text-align:center;">لوحة التحكم</h2>
     <div class="stat-box">
         <div class="stat-item">متصل<span id="stat-online" class="stat-num">0</span></div>
         <div class="stat-item">سائق<span id="stat-drivers" class="stat-num">0</span></div>
@@ -127,23 +129,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // عداد الزوار (Live)
+    let currentRateKey = '';
+    let currentRateData = {};
+
     const presenceRef = db.ref('presence');
     const myPresence = presenceRef.push(true);
     myPresence.onDisconnect().remove();
-    presenceRef.on('value', snap => { 
-        if(document.getElementById('stat-online')) document.getElementById('stat-online').innerText = snap.numChildren(); 
-    });
+    presenceRef.on('value', snap => { if(document.getElementById('stat-online')) document.getElementById('stat-online').innerText = snap.numChildren(); });
 
-    // الخريطة
-    let map = L.map('map').setView([33.3152, 44.3661], 6); // بداية بوسط العراق
+    let map = L.map('map').setView([33.31, 44.36], 6); 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    let marker = L.marker([33.3152, 44.3661], {draggable: true}).addTo(map);
-    map.on('click', e => { 
-        marker.setLatLng(e.latlng); 
-        document.getElementById('lat').value = e.latlng.lat; 
-        document.getElementById('lng').value = e.latlng.lng; 
-    });
+    let marker = L.marker([33.31, 44.36], {draggable: true}).addTo(map);
+    map.on('click', e => { marker.setLatLng(e.latlng); document.getElementById('lat').value = e.latlng.lat; document.getElementById('lng').value = e.latlng.lng; });
 
     window.onload = () => {
         const user = localStorage.getItem('satar_system_user');
@@ -163,21 +160,9 @@
         const name = document.getElementById('reg-name').value;
         const phone = document.getElementById('reg-phone').value;
         const prov = document.getElementById('reg-province').value;
-        if(!name || !phone || !prov) return alert("يرجى إكمال الاسم والموبايل واختيار المحافظة");
-        
-        const data = { 
-            name, phone, province: prov,
-            lat: document.getElementById('lat').value || 33.31, 
-            lng: document.getElementById('lng').value || 44.36, 
-            type: document.getElementById('reg-type').value, 
-            job: document.getElementById('reg-job').value || "سائق", 
-            area: document.getElementById('reg-area').value || "غير محدد", 
-            rating: 0, ratingCount: 0 
-        };
-        db.ref('users').push(data).then(() => { 
-            localStorage.setItem('satar_system_user', JSON.stringify(data)); 
-            location.reload(); 
-        });
+        if(!name || !phone || !prov) return alert("أكمل البيانات");
+        const data = { name, phone, province: prov, lat: document.getElementById('lat').value || 33.31, lng: document.getElementById('lng').value || 44.36, type: document.getElementById('reg-type').value, job: document.getElementById('reg-job').value || "سائق", area: document.getElementById('reg-area').value || "غير محدد", rating: 0, ratingCount: 0 };
+        db.ref('users').push(data).then(() => { localStorage.setItem('satar_system_user', JSON.stringify(data)); location.reload(); });
     }
 
     function loadData() {
@@ -186,7 +171,6 @@
             const aList = document.getElementById('admin-list');
             let dCount = 0, wCount = 0;
             list.innerHTML = ''; aList.innerHTML = '';
-            
             snap.forEach((child) => {
                 const v = child.val();
                 const avg = v.ratingCount > 0 ? (v.rating / v.ratingCount).toFixed(1) : "0";
@@ -194,42 +178,44 @@
                     wCount++;
                     list.innerHTML += `<div class="worker-card">
                         <h3>الأسطى ${v.name}</h3>
-                        <p>🛠️ المهنة: ${v.job} | 🏙️ المحافظة: ${v.province}</p>
-                        <p>📍 ${v.area} | ⭐ التقييم: ${avg}</p>
-                        <div class="stars-container" onclick="rateUser('${child.key}', ${v.rating}, ${v.ratingCount})">⭐ قيم النشمي</div>
+                        <p>🛠️ ${v.job} | 🏙️ ${v.province}</p>
+                        <p>📍 ${v.area} | ⭐ ${avg}</p>
+                        <div class="rating-star-btn" onclick="openRateModal('${child.key}', ${v.rating}, ${v.ratingCount})">⭐ قيم النشمي</div>
                         <a href="tel:${v.phone}" class="btn btn-call">📞 إتصال مباشر</a>
-                        <a href="https://www.google.com/maps?q=${v.lat},${v.lng}" target="_blank" class="btn btn-main" style="background:#666;">📍 موقع المحل</a>
                     </div>`;
                 } else { dCount++; }
-                aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;">
-                    <b>${v.name}</b> (${v.province}) - ${v.type} 
-                    <button onclick="delUser('${child.key}')" style="color:red; float:left; border:none; background:none; cursor:pointer;">❌ حذف</button>
-                </div>`;
+                aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${v.name}</b> (${v.province}) <button onclick="delUser('${child.key}')" style="color:red; float:left; border:none; background:none; cursor:pointer;">❌ حذف</button></div>`;
             });
-            if(document.getElementById('stat-drivers')) document.getElementById('stat-drivers').innerText = dCount;
-            if(document.getElementById('stat-workers')) document.getElementById('stat-workers').innerText = wCount;
+            document.getElementById('stat-drivers').innerText = dCount;
+            document.getElementById('stat-workers').innerText = wCount;
         });
     }
 
-    function rateUser(key, r, c) {
-        const s = prompt("قيم الأسطى من 1 إلى 5 نجوم:");
-        if(s >= 1 && s <= 5) {
-            db.ref('users/' + key).update({ rating: r + parseInt(s), ratingCount: c + 1 });
-            alert("تم إضافة تقييمك بنجاح");
-        }
+    // وظائف النافذة المخصصة (المودال)
+    function openRateModal(key, r, c) {
+        currentRateKey = key;
+        currentRateData = { r, c };
+        document.getElementById('rateModal').style.display = 'flex';
     }
-
-    function openAdmin() {
+    function submitRate() {
+        const s = document.getElementById('starSelect').value;
+        db.ref('users/' + currentRateKey).update({ rating: currentRateData.r + parseInt(s), ratingCount: currentRateData.c + 1 });
+        closeModal('rateModal');
+        alert("شكراً لتقييمك!");
+    }
+    function showAdminPrompt() { document.getElementById('adminPromptModal').style.display = 'flex'; }
+    function checkAdminPass() {
         const keys = ["satar1990", "2026", "5588", "3344"];
-        const input = prompt("أدخل رمز الإدارة:");
-        if (keys.includes(input)) document.getElementById('admin-panel').style.display = 'block';
-        else alert("الرمز خطأ");
+        const pass = document.getElementById('adminPassInput').value;
+        if (keys.includes(pass)) {
+            document.getElementById('admin-panel').style.display = 'block';
+            closeModal('adminPromptModal');
+        } else { alert("الرمز خطأ"); }
     }
-
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-    function delUser(key) { if(confirm("حذف المستخدم نهائياً؟")) db.ref('users/'+key).remove(); }
+    function delUser(key) { if(confirm("حذف؟")) db.ref('users/'+key).remove(); }
     function logout() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
-
