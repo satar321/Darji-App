@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دليل ديرتك - النسخة الشاملة</title>
+    <title>دليل ديرتك - النسخة الاحترافية</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -24,14 +24,9 @@
         .btn-main { background: var(--primary); color: white; }
         .btn-call { background: #28a745; color: white; }
         
-        /* نظام النجوم */
-        .stars-container { color: #ccc; font-size: 24px; cursor: pointer; margin: 10px 0; }
-        .stars-active { color: var(--gold); }
-        .rating-display { color: var(--gold); font-weight: bold; font-size: 14px; }
-
+        .stars-container { color: #ccc; font-size: 22px; cursor: pointer; margin: 5px 0; }
         .worker-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 15px; border-right: 8px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* لوحة الإدارة والإحصائيات */
         .admin-trigger { position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: 2px solid white; font-size: 10px; font-weight: bold; }
         #admin-panel { display: none; background: white; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; overflow-y: auto; padding: 20px; box-sizing: border-box; }
         .stat-box { background: #eef2f7; padding: 15px; border-radius: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
@@ -47,7 +42,8 @@
 
 <div class="header">
     <h1>🇮🇶 دليل ديرتك</h1>
-    <p id="visitor-count">الزوار حالياً: جاري التحميل...</p>
+    <!-- استبدال جملة عدد الزوار بجملة ترحيبية -->
+    <p>أهلاً بك في دليل ميسان الأول</p>
 </div>
 
 <div class="container">
@@ -65,20 +61,22 @@
     <div id="profile-section" class="card" style="text-align:center;">
         <h2 id="welcome-user">مرحباً</h2>
         <button class="btn btn-main" onclick="location.reload()">تحديث القائمة</button>
-        <button onclick="logout()" style="color:red; background:none; border:none; margin-top:15px;">خروج</button>
+        <button onclick="logout()" style="color:red; background:none; border:none; margin-top:15px; cursor:pointer;">خروج</button>
     </div>
 
-    <h2 style="text-align:center; color: var(--primary);">🛠️ الأسطوات المتوفرين</h2>
+    <h2 style="text-align:center; color: var(--primary);">🛠️ الأسطوات والخدمات</h2>
     <div id="display-list"></div>
 </div>
 
 <div id="admin-panel">
-    <button onclick="closeAdmin()" style="padding:10px;">🔙 عودة</button>
-    <h2 style="text-align:center;">لوحة التحكم والإحصائيات</h2>
+    <button onclick="closeAdmin()" style="padding:10px; border-radius:8px; border:none; background:#eee; cursor:pointer;">🔙 عودة</button>
+    <h2 style="text-align:center;">إحصائيات النظام</h2>
     <div class="stat-box">
-        <div class="stat-item">السواق<span id="stat-drivers" class="stat-num">0</span></div>
-        <div class="stat-item">الأسطوات<span id="stat-workers" class="stat-num">0</span></div>
+        <div class="stat-item">الزوار الآن<span id="stat-online" class="stat-num">0</span></div>
+        <div class="stat-item">إجمالي السواق<span id="stat-drivers" class="stat-num">0</span></div>
+        <div class="stat-item">إجمالي الأسطوات<span id="stat-workers" class="stat-num">0</span></div>
     </div>
+    <hr>
     <div id="admin-list"></div>
 </div>
 
@@ -95,11 +93,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // عداد الزوار (تجريبي)
+    // عداد الزوار المخفي عن الواجهة والظاهر للإدارة
     const presenceRef = db.ref('presence');
     const myPresence = presenceRef.push(true);
     myPresence.onDisconnect().remove();
-    presenceRef.on('value', snap => { document.getElementById('visitor-count').innerText = "الزوار حالياً: " + snap.numChildren(); });
+    presenceRef.on('value', snap => { 
+        if(document.getElementById('stat-online')) 
+            document.getElementById('stat-online').innerText = snap.numChildren(); 
+    });
 
     let map = L.map('map').setView([31.84, 47.14], 12); 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -118,7 +119,7 @@
     function register() {
         const name = document.getElementById('reg-name').value;
         const phone = document.getElementById('reg-phone').value;
-        if(!name || !phone) return alert("أكمل البيانات");
+        if(!name || !phone) return alert("يرجى إكمال الحقول");
         const data = { name, phone, lat: document.getElementById('lat').value || 31.84, lng: document.getElementById('lng').value || 47.14, type: document.getElementById('reg-type').value, job: document.getElementById('reg-job').value || "سائق", area: document.getElementById('reg-area').value || "ميسان", rating: 0, ratingCount: 0 };
         db.ref('users').push(data).then(() => { localStorage.setItem('satar_system_user', JSON.stringify(data)); location.reload(); });
     }
@@ -132,29 +133,26 @@
             
             snap.forEach((child) => {
                 const v = child.val();
-                const stars = v.ratingCount > 0 ? (v.rating / v.ratingCount).toFixed(1) : "0";
+                const avg = v.ratingCount > 0 ? (v.rating / v.ratingCount).toFixed(1) : "0";
                 if(v.type === 'worker') {
                     wCount++;
                     list.innerHTML += `<div class="worker-card">
                         <h3>الأسطى ${v.name} (${v.job})</h3>
-                        <p>📍 ${v.area} | ⭐ التقييم: ${stars}</p>
-                        <div class="stars-container" onclick="rateUser('${child.key}', ${v.rating || 0}, ${v.ratingCount || 0})">⭐⭐⭐⭐⭐ (قيم الآن)</div>
-                        <a href="tel:${v.phone}" class="btn btn-call">📞 إتصال</a>
+                        <p>📍 ${v.area} | ⭐ التقييم: ${avg}</p>
+                        <div class="stars-container" onclick="rateUser('${child.key}', ${v.rating}, ${v.ratingCount})">⭐⭐⭐⭐⭐ <small>(اضغط للتقييم)</small></div>
+                        <a href="tel:${v.phone}" class="btn btn-call">📞 إتصال مباشر</a>
                     </div>`;
                 } else { dCount++; }
-                aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${v.name}</b> (${v.type}) - ⭐ ${stars} <button onclick="delUser('${child.key}')" style="color:red;">حذف</button></div>`;
+                aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px;"><b>${v.name}</b> (${v.type}) <button onclick="delUser('${child.key}')" style="color:red; float:left; border:none; background:none; cursor:pointer;">حذف</button></div>`;
             });
-            document.getElementById('stat-drivers').innerText = dCount;
-            document.getElementById('stat-workers').innerText = wCount;
+            if(document.getElementById('stat-drivers')) document.getElementById('stat-drivers').innerText = dCount;
+            if(document.getElementById('stat-workers')) document.getElementById('stat-workers').innerText = wCount;
         });
     }
 
-    function rateUser(key, currentRating, count) {
-        const star = prompt("قيم الأسطى من 1 إلى 5:");
-        if(star >= 1 && star <= 5) {
-            db.ref('users/' + key).update({ rating: currentRating + parseInt(star), ratingCount: count + 1 });
-            alert("شكراً لتقييمك!");
-        }
+    function rateUser(key, r, c) {
+        const s = prompt("قيم من 1 إلى 5:");
+        if(s >= 1 && s <= 5) db.ref('users/' + key).update({ rating: r + parseInt(s), ratingCount: c + 1 });
     }
 
     function openAdmin() {
@@ -163,9 +161,8 @@
     }
 
     function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-    function delUser(key) { if(confirm("حذف؟")) db.ref('users/'+key).remove(); }
+    function delUser(key) { if(confirm("حذف المستخدم؟")) db.ref('users/'+key).remove(); }
     function logout() { localStorage.clear(); location.reload(); }
 </script>
 </body>
 </html>
-
